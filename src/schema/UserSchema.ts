@@ -1,4 +1,4 @@
-import { ApiModel, ApiModelProperty, SwaggerDefinitionConstant } from 'swagger-express-ts';
+import { ApiModel, ApiModelProperty } from 'swagger-express-ts';
 
 import { User } from '../model/';
 
@@ -10,23 +10,15 @@ export class UserSchema {
     @ApiModelProperty({ required: true })
     email: string;
 
-    @ApiModelProperty({
-        required: true,
-        type: SwaggerDefinitionConstant.Response.Type.ARRAY,
-        itemType: SwaggerDefinitionConstant.Response.Type.STRING
-    })
-    roles: string[];
-
     @ApiModelProperty({ required: true })
     isEmailVerified: boolean;
 }
 
 export function transformToUserSchema(user: User): UserSchema {
-    const { id, email, roles, isEmailVerified } = user;
+    const { id, email, isEmailVerified } = user;
     const schema = {
         id,
         email,
-        roles: roles.map((role) => role.name),
         isEmailVerified: !!isEmailVerified
     };
 

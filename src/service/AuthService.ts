@@ -3,9 +3,9 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import winston from "winston";
-import { getConnection, getRepository, Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 
-import { User, Credentials, OtpCode, Role } from './../model/';
+import { User, Credentials, OtpCode } from '../model';
 import {
     SignUpRequestSchema,
     transformToLoggedInUserSchema,
@@ -19,10 +19,10 @@ import {
     transformToUserSchema,
     UserSchema,
     ChangePasswordRequestSchema
-} from './../schema/';
-import { EncodedData, JwtPayload, Mail, OtpStructure, RoleEnum } from './../interface/';
-import { EmailSubjects, ErrorMessages } from './../helper';
-import { MailService } from '.';
+} from '../schema/';
+import { EncodedData, JwtPayload, Mail, OtpStructure } from '../interface/';
+import { EmailSubjects, ErrorMessages } from '../messages';
+import { LoggerService, MailService } from '.';
 
 @injectable()
 export class AuthService {
@@ -32,7 +32,7 @@ export class AuthService {
 
     constructor(
         @inject("MailService") private mailService: MailService,
-        @inject('Logger') private logger: winston.Logger
+        @inject('LoggerService') private logger: LoggerService
     ) {
         this.userRepository = getRepository(User);
         this.credentialsRepository = getRepository(Credentials);
@@ -57,8 +57,6 @@ export class AuthService {
         user.credentials = insertedCredentials;
 
         const insertedUser = await this.userRepository.save(user);
-
-        insertedUser.roles = [];
 
         const otpStructure = this.generateOtp();
 
@@ -269,31 +267,6 @@ export class AuthService {
         };
     }
 
-    public async addRole(userId: number, newRole: RoleEnum): Promise<SuccessResponseSchema> {
-        const user = await this.userRepository.findOne({ id: userId, isDeleted: false }, { relations: ['credentials', 'roles'] });
-        if (!user) {
-            throw ErrorMessages.UserWithGivenIdDoesntExist;
-        }
-
-        const roles = user.roles.map((role) => role.id);
-
-        if (roles.includes(newRole)) {
-            throw ErrorMessages.RoleAlreadyAdded;
-        }
-
-        roles.push(newRole);
-
-        await getConnection()
-            .createQueryBuilder()
-            .relation(User, "roles")
-            .of(user)
-            .add({ id: newRole });
-
-        return {
-            success: true
-        };
-    }
-
     private encodePassword(password: string): EncodedData {
         const salt = crypto.randomBytes(16).toString('hex');
         const hash = crypto.pbkdf2Sync(password, salt, 10000, 512, 'sha512').toString('hex');
@@ -311,7 +284,6 @@ export class AuthService {
             id: user.id,
             email: user.email,
             isEmailVerified: user.isEmailVerified,
-            roles: user.roles.map((role) => role.id)
         };
 
         const jwtToken: string = jwt.sign(jwtPayload, process.env.JWT_SECRET ?? 'secret');

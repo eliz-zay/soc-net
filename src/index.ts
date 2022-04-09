@@ -11,14 +11,16 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 
 import * as swagger from "swagger-express-ts";
 
-import { logger, createDbConnection, apiTokenMiddleware, ErrorMessages } from './helper/';
+import { createDbConnection, apiTokenMiddleware } from './core';
+import { ErrorMessages } from './messages';
 
 import "./controller/";
 import "./schema/";
 
 import {
     AuthService,
-    MailService
+    MailService,
+    LoggerService
 } from './service';
 
 import { ErrorSchema } from './schema/';
@@ -30,10 +32,9 @@ async function bootstrapServer() {
 
     const container = new Container();
 
-    container.bind('Logger').toConstantValue(logger);
-
     container.bind<AuthService>('AuthService').to(AuthService);
     container.bind<MailService>('MailService').to(MailService);
+    container.bind<LoggerService>('LoggerService').to(LoggerService);
 
     const expressServer = new InversifyExpressServer(container, null, { rootPath: "/api" });
 
@@ -41,9 +42,9 @@ async function bootstrapServer() {
 
     expressServer
         .setConfig(setExpressMiddlewares)
-        .setErrorConfig(setExpressErrorHandler)
+        .setErrorConfig(setExpressErrorHandler(container.get<LoggerService>('LoggerService')))
         .build()
-        .listen(port, () => logger.info(`Started on port ${port}. Swagger: http://localhost:${port}/api-docs/swagger`));
+        .listen(port, () => container.get<LoggerService>('LoggerService').info(`Started on port ${port}. Swagger: http://localhost:${port}/api-docs/swagger`));
 }
 
 function setExpressMiddlewares(app: express.Application) {
@@ -89,17 +90,19 @@ function setExpressMiddlewares(app: express.Application) {
     ));
 }
 
-function setExpressErrorHandler(app: express.Application) {
-    app.use((err: any, req: express.Request, res: express.Response, next: any) => {
-        if (err instanceof ErrorSchema) {
-            res.status(400).send(err);
-        } else if (err?.name === 'UnauthorizedError') {
-            res.status(401).send(ErrorMessages.InvalidToken);
-        } else {
-            logger.error(err.stack);
-            res.status(500).send(ErrorMessages.InternalError);
-        }
-    });
+function setExpressErrorHandler(loggerService: LoggerService) {
+    return (app: express.Application) => {
+        app.use((err: any, req: express.Request, res: express.Response, next: any) => {
+            if (err instanceof ErrorSchema) {
+                res.status(err.httpCode).send(err.preview());
+            } else if (err?.name === 'UnauthorizedError') {
+                res.status(401).send(ErrorMessages.InvalidToken.preview());
+            } else {
+                loggerService.error(err.stack);
+                res.status(500).send(ErrorMessages.InternalError.preview());
+            }
+        });
+    }
 }
 
 bootstrapServer();

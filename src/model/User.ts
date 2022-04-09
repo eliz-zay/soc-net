@@ -12,7 +12,6 @@ import {
 } from "typeorm";
 
 import { Credentials, OtpCode } from '.';
-import { Role } from "./Role";
 
 @Entity()
 export class User {
@@ -21,10 +20,6 @@ export class User {
 
     @Column({ name: 'email', type: 'varchar', length: '100', nullable: false })
     email: string;
-
-    @ManyToMany(() => Role)
-    @JoinTable({ joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'role_id' } })
-    roles: Role[];
 
     @Column({ name: 'is_email_verified', type: 'boolean', nullable: false, default: false })
     isEmailVerified: boolean;

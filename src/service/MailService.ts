@@ -3,12 +3,13 @@ import { inject, injectable } from 'inversify';
 import axios from 'axios';
 
 import { Mail } from '../interface';
+import { LoggerService } from './LoggerService';
 
 @injectable()
 export class MailService {
     private token: string | null;
 
-    constructor(@inject('Logger') private logger: winston.Logger) {
+    constructor(@inject('LoggerService') private logger: LoggerService) {
     }
 
     public async sendMail(mail: Mail) {
