@@ -22,7 +22,7 @@ import {
 } from './../schema/';
 import { EncodedData, JwtPayload, Mail, OtpStructure, RoleEnum } from './../interface/';
 import { EmailSubjects, ErrorMessages } from './../helper';
-import { MailService, BroadcastService } from '.';
+import { MailService } from '.';
 
 @injectable()
 export class AuthService {
@@ -32,7 +32,6 @@ export class AuthService {
 
     constructor(
         @inject("MailService") private mailService: MailService,
-        @inject("BroadcastService") private broadcastService: BroadcastService,
         @inject('Logger') private logger: winston.Logger
     ) {
         this.userRepository = getRepository(User);
@@ -129,8 +128,6 @@ export class AuthService {
         await this.checkOtpCode({ email, otpCode });
 
         await this.userRepository.update({ id }, { isEmailVerified: true });
-
-        this.broadcastService.broadcastEmailVerification({ userId: id });
 
         return { success: true };
     }

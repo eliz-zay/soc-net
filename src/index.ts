@@ -4,15 +4,12 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import compression from 'compression';
 import jwt from 'express-jwt';
-import amqplib from 'amqplib';
 
 import 'reflect-metadata';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
 
 import * as swagger from "swagger-express-ts";
-
-import config from './config.json';
 
 import { logger, createDbConnection, apiTokenMiddleware, ErrorMessages } from './helper/';
 
@@ -21,7 +18,6 @@ import "./schema/";
 
 import {
     AuthService,
-    BroadcastService,
     MailService
 } from './service';
 
@@ -34,18 +30,10 @@ async function bootstrapServer() {
 
     const container = new Container();
 
-    const connection = await amqplib.connect(process.env.AMQP_URL as string);
-    const channel = await connection.createChannel();
-
-    await channel.assertExchange(config.eventsExchange, 'fanout', { durable: true });
-
-    container.bind('MQChannel').toConstantValue(channel);
-
     container.bind('Logger').toConstantValue(logger);
 
     container.bind<AuthService>('AuthService').to(AuthService);
     container.bind<MailService>('MailService').to(MailService);
-    container.bind<BroadcastService>('BroadcastService').to(BroadcastService);
 
     const expressServer = new InversifyExpressServer(container, null, { rootPath: "/api" });
 
@@ -74,20 +62,20 @@ function setExpressMiddlewares(app: express.Application) {
         {
             definition: {
                 info: {
-                    title: 'JDL auth API',
+                    title: 'Cosma API',
                     contact: {
-                        name: "JDK",
-                        url: "https://www.justdoluck.com",
-                        email: "dev@jdl.com"
+                        name: "Cosma",
+                        url: "https://www.cosma-app.ru",
+                        email: "team@cosma-app.ru"
                     },
                     version: "0.0.1",
                 },
                 schemes: ['http', 'https'],
                 basePath: '/api/',
                 securityDefinitions: {
-                    'Api-Token': {
+                    'Api-Key': {
                         type: 'apiKey',
-                        name: 'Api-Token',
+                        name: 'Api-Key',
                         in: 'header'
                     },
                     'Authorization': {
