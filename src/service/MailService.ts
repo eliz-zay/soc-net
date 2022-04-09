@@ -1,4 +1,3 @@
-import winston from 'winston';
 import { inject, injectable } from 'inversify';
 import axios from 'axios';
 
@@ -39,7 +38,6 @@ export class MailService {
         });
 
         this.logger.info(`E-mail with subject '${mail.subject}' to user(s) ${mail.destinationAddresses.join(', ')}`);
-        console.log(response.data);
     }
 
     private async updateToken() {
