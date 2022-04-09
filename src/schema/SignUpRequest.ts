@@ -1,13 +1,14 @@
 import { ApiModel, ApiModelProperty } from 'swagger-express-ts';
 
 import {
+    IsAlphanumeric,
     IsEmail,
     IsString,
-    MaxLength
+    MaxLength,
 } from 'class-validator';
 
 @ApiModel()
-export class SignInRequestSchema {
+export class SignUpRequest {
     @IsEmail()
     @MaxLength(40)
     @ApiModelProperty({ required: true })

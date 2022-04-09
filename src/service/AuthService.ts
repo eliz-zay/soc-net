@@ -7,18 +7,18 @@ import { getRepository, Repository } from "typeorm";
 
 import { User, Credentials, OtpCode } from '../model';
 import {
-    SignUpRequestSchema,
+    SignUpRequest,
     transformToLoggedInUserSchema,
-    SignInRequestSchema,
+    SignInRequest,
     LoggedInUserSchema,
-    VerifyEmailRequestSchema,
-    SuccessResponseSchema,
-    RequestPasswordResetRequestSchema,
-    ResetPasswordRequestSchema,
-    CheckOtpCodeRequestSchema,
+    VerifyEmailRequest,
+    SuccessResponse,
+    RequestPasswordResetRequest,
+    ResetPasswordRequest,
+    CheckOtpCodeRequest,
     transformToUserSchema,
     UserSchema,
-    ChangePasswordRequestSchema
+    ChangePasswordRequest
 } from '../schema/';
 import { EncodedData, JwtPayload, Mail, OtpStructure } from '../interface/';
 import { EmailSubjects, ErrorMessages } from '../messages';
@@ -39,8 +39,8 @@ export class AuthService {
         this.otpCodeRepository = getRepository(OtpCode);
     }
 
-    public async signUp(signUpRequestSchema: SignUpRequestSchema): Promise<LoggedInUserSchema> {
-        const { email, password } = signUpRequestSchema;
+    public async signUp(SignUpRequest: SignUpRequest): Promise<LoggedInUserSchema> {
+        const { email, password } = SignUpRequest;
 
         const usersByEmail = await this.userRepository.find({ email });
         if (usersByEmail.length !== 0) {
@@ -52,7 +52,7 @@ export class AuthService {
         const credentials = new Credentials(encodedPassword);
         const insertedCredentials = await this.credentialsRepository.save(credentials);
 
-        const user = new User(signUpRequestSchema);
+        const user = new User(SignUpRequest);
 
         user.credentials = insertedCredentials;
 
@@ -84,7 +84,7 @@ export class AuthService {
         return transformToLoggedInUserSchema(mappedUser, jwtToken);
     }
 
-    public async requestEmailVerification(jwtPayload: JwtPayload): Promise<SuccessResponseSchema> {
+    public async requestEmailVerification(jwtPayload: JwtPayload): Promise<SuccessResponse> {
         if (!jwtPayload) {
             throw ErrorMessages.AuthorizationRequired;
         }
@@ -115,13 +115,13 @@ export class AuthService {
         return { success: true };
     }
 
-    public async verifyEmail(jwtPayload: JwtPayload, verifyEmailRequestSchema: VerifyEmailRequestSchema): Promise<SuccessResponseSchema> {
+    public async verifyEmail(jwtPayload: JwtPayload, VerifyEmailRequest: VerifyEmailRequest): Promise<SuccessResponse> {
         if (!jwtPayload) {
             throw ErrorMessages.AuthorizationRequired;
         }
 
         const { id, email } = jwtPayload;
-        const { otpCode } = verifyEmailRequestSchema;
+        const { otpCode } = VerifyEmailRequest;
 
         await this.checkOtpCode({ email, otpCode });
 
@@ -141,8 +141,8 @@ export class AuthService {
         return transformToUserSchema(user);
     }
 
-    public async signIn(signInRequestSchema: SignInRequestSchema): Promise<LoggedInUserSchema> {
-        const { email, password } = signInRequestSchema;
+    public async signIn(SignInRequest: SignInRequest): Promise<LoggedInUserSchema> {
+        const { email, password } = SignInRequest;
 
         const user = await this.userRepository.findOne({ email, isDeleted: false }, { relations: ['credentials', 'roles'] });
         if (!user) {
@@ -162,8 +162,8 @@ export class AuthService {
         return transformToLoggedInUserSchema(mappedUser, jwtToken);
     }
 
-    public async checkOtpCode(checkOtpCodeRequestSchema: CheckOtpCodeRequestSchema): Promise<SuccessResponseSchema> {
-        const { otpCode, email } = checkOtpCodeRequestSchema;
+    public async checkOtpCode(CheckOtpCodeRequest: CheckOtpCodeRequest): Promise<SuccessResponse> {
+        const { otpCode, email } = CheckOtpCodeRequest;
 
         const user = await this.userRepository.findOne({ email, isDeleted: false });
         if (!user) {
@@ -183,8 +183,8 @@ export class AuthService {
         return { success: true };
     }
 
-    public async requestPasswordReset(requestPasswordResetRequestSchema: RequestPasswordResetRequestSchema): Promise<SuccessResponseSchema> {
-        const { email } = requestPasswordResetRequestSchema;
+    public async requestPasswordReset(RequestPasswordResetRequest: RequestPasswordResetRequest): Promise<SuccessResponse> {
+        const { email } = RequestPasswordResetRequest;
 
         const user = await this.userRepository.findOne({ email, isDeleted: false });
         if (!user) {
@@ -213,8 +213,8 @@ export class AuthService {
         return { success: true };
     }
 
-    public async resetPassword(resetPasswordRequestSchema: ResetPasswordRequestSchema): Promise<SuccessResponseSchema> {
-        const { otpCode, email, password } = resetPasswordRequestSchema;
+    public async resetPassword(ResetPasswordRequest: ResetPasswordRequest): Promise<SuccessResponse> {
+        const { otpCode, email, password } = ResetPasswordRequest;
 
         await this.checkOtpCode({ email, otpCode });
 
@@ -230,8 +230,8 @@ export class AuthService {
         return { success: true };
     }
 
-    public async changePassword(jwtPayload: JwtPayload, changePasswordRequestSchema: ChangePasswordRequestSchema): Promise<SuccessResponseSchema> {
-        const { currentPassword, newPassword } = changePasswordRequestSchema;
+    public async changePassword(jwtPayload: JwtPayload, ChangePasswordRequest: ChangePasswordRequest): Promise<SuccessResponse> {
+        const { currentPassword, newPassword } = ChangePasswordRequest;
 
         const user = await this.userRepository.findOne({ email: jwtPayload.email, isDeleted: false }, { relations: ['credentials'] });
         if (!user) {
@@ -252,7 +252,7 @@ export class AuthService {
         return { success: true };
     }
 
-    public async deleteUser(jwtPayload: JwtPayload): Promise<SuccessResponseSchema> {
+    public async deleteUser(jwtPayload: JwtPayload): Promise<SuccessResponse> {
         const { id } = jwtPayload;
 
         const user = await this.userRepository.findOne({ id, isDeleted: false });

@@ -1,7 +1,7 @@
 import { ApiModel, ApiModelProperty } from "swagger-express-ts";
 
 @ApiModel()
-export class SuccessResponseSchema {
+export class SuccessResponse {
     @ApiModelProperty({ required: true })
-    success: boolean;
+    success: true;
 }

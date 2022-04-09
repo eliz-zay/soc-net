@@ -6,53 +6,53 @@ import { makeValidateBody } from 'express-class-validator';
 
 import { AuthService } from './../service/';
 import {
-    SignUpRequestSchema,
-    SignInRequestSchema,
-    VerifyEmailRequestSchema,
-    SuccessResponseSchema,
-    RequestPasswordResetRequestSchema,
-    ResetPasswordRequestSchema,
+    SignUpRequest,
+    SignInRequest,
+    VerifyEmailRequest,
+    SuccessResponse,
+    RequestPasswordResetRequest,
+    ResetPasswordRequest,
     LoggedInUserResponse,
     UserResponse,
-    ChangePasswordRequestSchema
+    ChangePasswordRequest
 } from './../schema/';
 import { JwtPayload } from '../interface';
 
 @ApiPath({
-    path: "",
+    path: "/auth",
     name: "Auth",
-    security: { 'Api-Token': [] }
+    security: { 'Api-Key': [] }
 })
-@controller('')
+@controller('/auth')
 export class AuthController implements interfaces.Controller {
     constructor(@inject("AuthService") private authService: AuthService) { }
 
     @ApiOperationPost({
         path: '/sign-up',
-        parameters: { body: { required: true, model: "SignUpRequestSchema" } },
+        parameters: { body: { required: true, model: "SignUpRequest" } },
         responses: { 200: { model: "LoggedInUserResponse" } }
     })
-    @httpPost('/sign-up', makeValidateBody(SignUpRequestSchema))
-    private async signUp(@requestBody() signUpRequestSchema: SignUpRequestSchema): Promise<LoggedInUserResponse> {
-        const loggedInUser = await this.authService.signUp(signUpRequestSchema);
+    @httpPost('/sign-up', makeValidateBody(SignUpRequest))
+    private async signUp(@requestBody() body: SignUpRequest): Promise<LoggedInUserResponse> {
+        const loggedInUser = await this.authService.signUp(body);
 
         return {
-            payload: loggedInUser,
+            data: loggedInUser,
             success: true
         };
     }
 
     @ApiOperationPost({
         path: '/sign-in',
-        parameters: { body: { required: true, model: "SignInRequestSchema" } },
+        parameters: { body: { required: true, model: "SignInRequest" } },
         responses: { 200: { model: "LoggedInUserResponse" } }
     })
-    @httpPost('/sign-in', makeValidateBody(SignInRequestSchema))
-    private async signIn(@requestBody() signInRequestSchema: SignInRequestSchema): Promise<LoggedInUserResponse> {
-        const loggedInUser = await this.authService.signIn(signInRequestSchema);
+    @httpPost('/sign-in', makeValidateBody(SignInRequest))
+    private async signIn(@requestBody() body: SignInRequest): Promise<LoggedInUserResponse> {
+        const loggedInUser = await this.authService.signIn(body);
 
         return {
-            payload: loggedInUser,
+            data: loggedInUser,
             success: true
         };
     }
@@ -67,80 +67,80 @@ export class AuthController implements interfaces.Controller {
         const loggedInUser = await this.authService.getUserInfo(req.user);
 
         return {
-            payload: loggedInUser,
+            data: loggedInUser,
             success: true
         };
     }
 
     @ApiOperationGet({
         path: '/request-email-verification',
-        responses: { 200: { model: "SuccessResponseSchema" } },
+        responses: { 200: { model: "SuccessResponse" } },
         security: { 'Api-Token': [], 'Authorization': [] }
     })
     @httpGet('/request-email-verification')
-    private async requestEmailVerification(@request() req: any): Promise<SuccessResponseSchema> {
+    private async requestEmailVerification(@request() req: any): Promise<SuccessResponse> {
         return await this.authService.requestEmailVerification(req.user);
     }
 
     @ApiOperationPost({
         path: '/verify-email',
-        parameters: { body: { required: true, model: "VerifyEmailRequestSchema" } },
-        responses: { 200: { model: "SuccessResponseSchema" } },
+        parameters: { body: { required: true, model: "VerifyEmailRequest" } },
+        responses: { 200: { model: "SuccessResponse" } },
         security: { 'Api-Token': [], 'Authorization': [] }
     })
-    @httpPost('/verify-email', makeValidateBody(VerifyEmailRequestSchema))
+    @httpPost('/verify-email', makeValidateBody(VerifyEmailRequest))
     private async verifyEmail(
         @request() req: any,
-        @requestBody() verifyEmailRequestSchema: VerifyEmailRequestSchema
-    ): Promise<SuccessResponseSchema> {
-        return await this.authService.verifyEmail(req.user, verifyEmailRequestSchema);
+        @requestBody() body: VerifyEmailRequest
+    ): Promise<SuccessResponse> {
+        return await this.authService.verifyEmail(req.user, body);
     }
 
     @ApiOperationPost({
         path: '/reset-password',
-        parameters: { body: { required: true, model: "ResetPasswordRequestSchema" } },
-        responses: { 200: { model: "SuccessResponseSchema" } }
+        parameters: { body: { required: true, model: "ResetPasswordRequest" } },
+        responses: { 200: { model: "SuccessResponse" } }
     })
-    @httpPost('/reset-password', makeValidateBody(ResetPasswordRequestSchema))
+    @httpPost('/reset-password', makeValidateBody(ResetPasswordRequest))
     private async resetPassword(
-        @requestBody() resetPasswordRequestSchema: ResetPasswordRequestSchema
-    ): Promise<SuccessResponseSchema> {
-        return await this.authService.resetPassword(resetPasswordRequestSchema);
+        @requestBody() body: ResetPasswordRequest
+    ): Promise<SuccessResponse> {
+        return await this.authService.resetPassword(body);
     }
 
     @ApiOperationPost({
         path: '/request-password-reset',
-        parameters: { body: { required: true, model: "RequestPasswordResetRequestSchema" } },
-        responses: { 200: { model: "SuccessResponseSchema" } }
+        parameters: { body: { required: true, model: "RequestPasswordResetRequest" } },
+        responses: { 200: { model: "SuccessResponse" } }
     })
-    @httpPost('/request-password-reset', makeValidateBody(RequestPasswordResetRequestSchema))
+    @httpPost('/request-password-reset', makeValidateBody(RequestPasswordResetRequest))
     private async requestPasswordReset(
-        @requestBody() requestPasswordResetRequestSchema: RequestPasswordResetRequestSchema
-    ): Promise<SuccessResponseSchema> {
-        return await this.authService.requestPasswordReset(requestPasswordResetRequestSchema);
+        @requestBody() body: RequestPasswordResetRequest
+    ): Promise<SuccessResponse> {
+        return await this.authService.requestPasswordReset(body);
     }
 
     @ApiOperationPost({
         path: '/change-password',
-        parameters: { body: { required: true, model: "ChangePasswordRequestSchema" } },
-        responses: { 200: { model: "SuccessResponseSchema" } },
+        parameters: { body: { required: true, model: "ChangePasswordRequest" } },
+        responses: { 200: { model: "SuccessResponse" } },
         security: { 'Api-Token': [], 'Authorization': [] }
     })
-    @httpPost('/reset-password', makeValidateBody(ChangePasswordRequestSchema))
+    @httpPost('/reset-password', makeValidateBody(ChangePasswordRequest))
     private async changePassword(
         @request() req: any,
-        @requestBody() changePasswordRequestSchema: ChangePasswordRequestSchema
-    ): Promise<SuccessResponseSchema> {
-        return await this.authService.changePassword(req.user, changePasswordRequestSchema);
+        @requestBody() body: ChangePasswordRequest
+    ): Promise<SuccessResponse> {
+        return await this.authService.changePassword(req.user, body);
     }
 
     @ApiOperationDelete({
         path: '/delete',
         parameters: {},
-        responses: { 200: { model: "SuccessResponseSchema" } }
+        responses: { 200: { model: "SuccessResponse" } }
     })
     @httpPost('/delete')
-    private async delete(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponseSchema> {
+    private async delete(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponse> {
         return await this.authService.deleteUser(req.user);
     }
 }

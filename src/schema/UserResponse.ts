@@ -4,7 +4,7 @@ import { UserSchema } from '.';
 @ApiModel()
 export class UserResponse {
     @ApiModelProperty({ itemType: SwaggerDefinitionConstant.Response.Type.OBJECT, model: "LoggedInUserSchema", required: true })
-    payload: UserSchema;
+    data: UserSchema;
 
     @ApiModelProperty({ required: true })
     success: boolean;

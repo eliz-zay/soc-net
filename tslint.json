@@ -1,9 +1,13 @@
 {
     "extends": "tslint:recommended",
-    "rulesDirectory": ["src/"],
+    "rulesDirectory": [
+        "src/"
+    ],
     "rules": {
         "max-line-length": {
-            "options": [150]
+            "options": [
+                150
+            ]
         },
         "new-parens": true,
         "no-arg": true,
@@ -14,11 +18,15 @@
         "member-access": false,
         "object-literal-sort-keys": false,
         "trailing-comma": false,
-        "member-ordering": false
+        "member-ordering": false,
+        "max-classes-per-file": false
     },
     "jsRules": {
         "max-line-length": {
-            "options": [150]
-        }
+            "options": [
+                150
+            ]
+        },
+        "max-classes-per-file": false
     }
 }

@@ -4,7 +4,7 @@ import { IsInt, IsEmail, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 @ApiModel()
-export class CheckOtpCodeRequestSchema {
+export class CheckOtpCodeRequest {
     @IsEmail()
     @MaxLength(40)
     @ApiModelProperty({ required: true })

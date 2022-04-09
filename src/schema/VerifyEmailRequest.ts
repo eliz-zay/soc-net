@@ -4,7 +4,7 @@ import { IsInt } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 @ApiModel()
-export class VerifyEmailRequestSchema {
+export class VerifyEmailRequest {
     @IsInt()
     @Transform((value) => Number(value))
     @ApiModelProperty({ required: true })
