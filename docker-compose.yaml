@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v2.4
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
+      - "--certificatesresolvers.mytlschallenge.acme.email=info@justdoluck.ru"
+      - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/jdl/letsencrypt:/letsencrypt
+
+
+  auth:
+    image: $DOCKER_IMG
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`auth.justdoluck.ru`)"
+      - "traefik.http.routers.auth.entrypoints=web"
+      - "traefik.http.routers.auth.middlewares=redirectscheme"
+      - "traefik.http.routers.auth-ssl.rule=Host(`auth.justdoluck.ru`)"
+      - "traefik.http.routers.auth-ssl.entrypoints=websecure"
+      - "traefik.http.routers.auth-ssl.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.auth-ssl.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.redirectscheme.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirectscheme.redirectscheme.permanent=true"
+
+  postgres:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_USER: $DB_USER
+      POSTGRES_DB: $DB_DBNAME
+    volumes:
+      - /opt/jdl/postgres:/var/lib/postgresql/data
