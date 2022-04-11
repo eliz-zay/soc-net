@@ -5,10 +5,14 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     JoinColumn,
-    ManyToOne
+    ManyToOne,
+    ManyToMany,
+    OneToMany,
+    JoinTable,
 } from "typeorm";
 
-import { Geo } from ".";
+import { Geo } from '.';
+import { Post } from './Post';
 
 export class OtpCode {
     code: number;
@@ -111,6 +115,20 @@ export class User {
 
     @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
     deletedAt?: Date;
+
+    @ManyToMany(() => User, (user) => user.followers)
+    @JoinTable({ joinColumn: { name: 'follower_id' }, inverseJoinColumn: { name: 'followee_id' } })
+    followees: User[];
+    
+    @ManyToMany(() => User, (user) => user.followees)
+    followers: User[];
+
+    @ManyToMany(() => Post, (post) => post.likes)
+    @JoinTable({ joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'post_id' } })
+    likedPosts: Post[];
+
+    @OneToMany(() => Post, (post) => post.user)
+    posts: Post[];
 
     constructor(partial: Partial<User>) {
         Object.assign(this, partial);
