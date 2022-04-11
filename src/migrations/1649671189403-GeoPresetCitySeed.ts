@@ -3,7 +3,9 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 import { Geo } from "../model";
 import geoPresets from './seed-data/geo.json';
 
-export class GeoPresetCitySeed1648212817931 implements MigrationInterface {
+export class GeoPresetCitySeed1649671189403 implements MigrationInterface {
+    name = 'GeoPresetCitySeed1649671189403';
+
     public async up(queryRunner: QueryRunner): Promise<void> {
         const chunkSize = 1000;
 
