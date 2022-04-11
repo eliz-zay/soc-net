@@ -19,7 +19,7 @@ async function run() {
     const regions = [];
     const cities = [];
 
-    countries.push({ id: idCounter, name: 'Россия', parentId: null, range: 'country' });
+    countries.push({ id: idCounter, name: 'Россия', range: 'Country' });
 
     idCounter++;
 
@@ -27,7 +27,7 @@ async function run() {
 
     for (const regionRaw of russianGeoRaw.areas) {
         if (regionRaw.areas.length) {
-            regions.push({ id: idCounter, name: regionRaw.name, parentId: countries[0].id, range: 'region' });
+            regions.push({ id: idCounter, name: regionRaw.name, parentId: countries[0].id, range: 'Region' });
 
             idCounter++;
         } else {
@@ -49,19 +49,19 @@ async function run() {
         }
 
         if (regions[i].name === 'Московская область') {
-            cities.push({ id: idCounter, name: 'Москва', parentId: regions[i].id, range: 'city' });
+            cities.push({ id: idCounter, name: 'Москва', parentId: regions[i].id, range: 'City' });
 
             idCounter++;
         }
 
         if (regions[i].name === 'Ленинградская область') {
-            cities.push({ id: idCounter, name: 'Санкт-петербург', parentId: regions[i].id, range: 'city' });
+            cities.push({ id: idCounter, name: 'Санкт-петербург', parentId: regions[i].id, range: 'City' });
 
             idCounter++;
         }
 
         for (const city of russianGeoRaw.areas[i].areas) {
-            cities.push({ id: idCounter, name: city.name, parentId: regions[i].id, range: 'city' });
+            cities.push({ id: idCounter, name: city.name, parentId: regions[i].id, range: 'City' });
 
             idCounter++;
         }

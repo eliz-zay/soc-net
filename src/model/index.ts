@@ -1,3 +1,2 @@
-export * from './Credentials';
+export * from './Geo';
 export * from './User';
-export * from './OtpCode';
