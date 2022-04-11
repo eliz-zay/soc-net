@@ -16,7 +16,7 @@ import {
     UserResponse,
     ChangePasswordRequest
 } from './../schema/';
-import { JwtPayload } from '../interface';
+import { JwtPayload } from '../core';
 
 @ApiPath({
     path: "/auth",

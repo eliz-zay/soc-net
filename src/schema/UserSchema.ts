@@ -15,11 +15,11 @@ export class UserSchema {
 }
 
 export function transformToUserSchema(user: User): UserSchema {
-    const { id, email, isEmailVerified } = user;
+    const { id, email, emailVerifiedAt } = user;
     const schema = {
         id,
         email,
-        isEmailVerified: !!isEmailVerified
+        isEmailVerified: !!emailVerifiedAt
     };
 
     return schema;

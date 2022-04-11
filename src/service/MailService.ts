@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 import axios from 'axios';
 
-import { Mail } from '../interface';
-import { LoggerService } from './LoggerService';
+import { Mail } from '../core';
+import { LoggerService } from '.';
 
 @injectable()
 export class MailService {
