@@ -32,7 +32,7 @@ export async function signJwt(payload: any, secret: string): Promise<string> {
 }
 
 export function encode(text: string) {
-    const algorithm = 'aes-128-gcm';
+    const algorithm = 'aes-256-cbc';
 
     const cipher = crypto.createCipheriv(
         algorithm,
@@ -44,12 +44,12 @@ export function encode(text: string) {
 }
 
 export function decode(encoded: string) {
-    const algorithm = 'aes-128-gcm';
+    const algorithm = 'aes-256-cbc';
 
     const decipher = crypto.createDecipheriv(
         algorithm,
         process.env.ENCODE_SECRET as string,
-        Buffer.from(process.env.ENCODE_IV as string, 'hex')
+        process.env.ENCODE_IV as string
     );
 
     const decrpyted = Buffer.concat([decipher.update(Buffer.from(encoded, 'hex')), decipher.final()]);
