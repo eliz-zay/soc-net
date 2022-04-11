@@ -14,7 +14,6 @@ export class OtpCode {
     code: number;
     generationDate: Date;
     expirationDate: Date;
-    verified: boolean;
 }
 
 export enum EUserGender {

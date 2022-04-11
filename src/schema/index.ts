@@ -7,7 +7,6 @@ export * from './ResetPasswordRequest';
 export * from './CheckOtpCodeRequest';
 export * from './UserSchema';
 export * from './ErrorSchema';
-export * from './RoleSchema';
 export * from './ChangePasswordRequest';
 
 export * from './LoggedInUserResponse';
