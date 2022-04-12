@@ -13,6 +13,8 @@ import {
 
 import { Geo } from '.';
 import { Post } from './Post';
+import { PostGroup } from './PostGroup';
+import { Notification } from './Notification';
 
 export class OtpCode {
     code: number;
@@ -106,15 +108,6 @@ export class User {
     @Column({ name: 'business_description', type: 'varchar', length: '1000', nullable: true })
     businessDescription?: string;
 
-    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
-    createdAt: Date;
-
-    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
-    updatedAt: Date;
-
-    @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
-    deletedAt?: Date;
-
     @ManyToMany(() => User, (user) => user.followers)
     @JoinTable({ joinColumn: { name: 'follower_id' }, inverseJoinColumn: { name: 'followee_id' } })
     followees: User[];
@@ -126,8 +119,27 @@ export class User {
     @JoinTable({ joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'post_id' } })
     likedPosts: Post[];
 
+    @ManyToMany(() => PostGroup, (group) => group.joinedUsers)
+    @JoinTable({ joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'post_group_id' } })
+    joinedPrivateGroups: PostGroup[];
+
     @OneToMany(() => Post, (post) => post.user)
     posts: Post[];
+
+    @OneToMany(() => PostGroup, (group) => group.user)
+    groups: PostGroup[];
+
+    @OneToMany(() => Notification, (notification) => notification.user)
+    notifications: Notification[];
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
+    updatedAt: Date;
+
+    @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+    deletedAt?: Date;
 
     constructor(partial: Partial<User>) {
         Object.assign(this, partial);

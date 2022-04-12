@@ -14,7 +14,8 @@ import { PostGroup } from './PostGroup';
 
 export enum MediaType {
     Photo = 'Photo',
-    Video = 'Video'
+    Video = 'Video',
+    Audio = 'Audio'
 }
 
 export class MediaUrls {
@@ -51,6 +52,9 @@ export class Post {
     @JoinColumn({ name: 'post_group_id' })
     postGroup: PostGroup;
 
+    @ManyToMany(() => User, (user) => user.likedPosts)
+    likes: User[];
+
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
 
@@ -59,9 +63,6 @@ export class Post {
 
     @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
     deletedAt?: Date;
-
-    @ManyToMany(() => User, (user) => user.likedPosts)
-    likes: User[];
 
     constructor(partial: Partial<User>) {
         Object.assign(this, partial);

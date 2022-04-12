@@ -7,13 +7,14 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
+    ManyToMany,
 } from 'typeorm';
 
 import { Post } from './Post';
 import { User } from './User';
 
 export enum ViewType {
-    Inst = 'Inst',
+    Grid = 'Grid',
     TextBlog = 'TextBlog'
 }
 
@@ -22,7 +23,7 @@ export class PostGroup {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.posts)
+    @ManyToOne(() => User, (user) => user.groups)
     @JoinColumn({ name: 'user_id' })
     user: User;
 
@@ -43,6 +44,9 @@ export class PostGroup {
 
     @OneToMany(() => Post, (post) => post.postGroup)
     posts: Post[];
+
+    @ManyToMany(() => User, (user) => user.joinedPrivateGroups)
+    joinedUsers: User[];
 
     // TODO: user_subscription_id
 
