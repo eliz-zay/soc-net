@@ -10,28 +10,20 @@ import {
 
 import { User } from './User';
 
-export enum ContentType {
-    Deal = 'Deal',
-    Followers = 'Followers'
-}
-
 @Entity()
-export class Notification {
+export class DealTemplate {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.notifications)
+    @ManyToOne(() => User, (user) => user.dealTemplates)
     @JoinColumn({ name: 'user_id' })
     user: User;
 
-    @Column({ name: 'content', type: 'varchar', length: '256', nullable: false })
-    content: string;
+    @Column({ type: 'varchar', length: '1000', nullable: false })
+    terms: string;
 
-    @Column({ name: 'content_type', type: 'varchar', length: 50, nullable: false })
-    contentType: ContentType;
-
-    @Column({ name: 'read_at', type: 'timestamp' })
-    readAt: Date;
+    @Column({ type: 'int', nullable: false })
+    price: number;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
@@ -42,7 +34,7 @@ export class Notification {
     @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
     deletedAt?: Date;
 
-    constructor(partial: Partial<User>) {
+    constructor(partial: Partial<DealTemplate>) {
         Object.assign(this, partial);
     }
 }

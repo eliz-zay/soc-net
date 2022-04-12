@@ -15,6 +15,7 @@ import { Geo } from '.';
 import { Post } from './Post';
 import { PostGroup } from './PostGroup';
 import { Notification } from './Notification';
+import { DealTemplate } from "./DealTemplate";
 
 export class OtpCode {
     code: number;
@@ -111,7 +112,7 @@ export class User {
     @ManyToMany(() => User, (user) => user.followers)
     @JoinTable({ joinColumn: { name: 'follower_id' }, inverseJoinColumn: { name: 'followee_id' } })
     followees: User[];
-    
+
     @ManyToMany(() => User, (user) => user.followees)
     followers: User[];
 
@@ -131,6 +132,9 @@ export class User {
 
     @OneToMany(() => Notification, (notification) => notification.user)
     notifications: Notification[];
+
+    @OneToMany(() => DealTemplate, (dealTemplate) => dealTemplate.user)
+    dealTemplates: DealTemplate[];
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
