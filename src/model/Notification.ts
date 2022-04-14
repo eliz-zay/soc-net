@@ -10,11 +10,9 @@ import {
 
 import { User } from './User';
 
-export enum ENotificationType {
-    NewFollower = 'NewFollower',
-    NewDeal = 'NewDeal',
-    DealStatusChanged = 'DealStatusChanged',
-    NewDealMessage = 'NewDealMessage',
+export enum ContentType {
+    Deal = 'Deal',
+    Followers = 'Followers'
 }
 
 @Entity()
@@ -29,8 +27,8 @@ export class Notification {
     @Column({ name: 'content', type: 'varchar', length: '256', nullable: false })
     content: string;
 
-    @Column({ name: 'content_type', type: 'varchar', length: '32', nullable: false })
-    contentType: ENotificationType;
+    @Column({ name: 'content_type', type: 'enum', enum: ContentType, nullable: false })
+    contentType: ContentType;
 
     @Column({ name: 'read_at', type: 'timestamp' })
     readAt: Date;

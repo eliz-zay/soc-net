@@ -12,14 +12,14 @@ import {
 import { User } from './User';
 import { PostGroup } from './PostGroup';
 
-export enum EMediaType {
+export enum MediaType {
     Photo = 'Photo',
     Video = 'Video',
     Audio = 'Audio'
 }
 
 export class MediaUrls {
-    type: EMediaType;
+    type: MediaType;
     url: string;
 }
 
