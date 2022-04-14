@@ -13,7 +13,7 @@ import {
 import { Post } from './Post';
 import { User } from './User';
 
-export enum ViewType {
+export enum EViewType {
     Grid = 'Grid',
     TextBlog = 'TextBlog'
 }
@@ -36,8 +36,8 @@ export class PostGroup {
     @Column({ name: 'order_number', type: 'int', nullable: true })
     orderNumber: number;
 
-    @Column({ name: 'view_type', type: 'enum', enum: ViewType, nullable: false })
-    viewType: ViewType;
+    @Column({ name: 'view_type', type: 'enum', enum: EViewType, nullable: false })
+    viewType: EViewType;
 
     @Column({ name: 'is_private', type: 'boolean', nullable: false, default: false })
     isPrivate: boolean;
