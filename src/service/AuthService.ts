@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import moment from 'moment';
 import { getRepository, IsNull, Repository } from "typeorm";
 
-import { User, OtpCode } from '../model';
+import { User, OtpCode, EMailType } from '../model';
 import {
     SignUpRequest,
     transformToLoggedInUserSchema,
@@ -17,9 +17,9 @@ import {
     UserSchema,
     ChangePasswordRequest
 } from '../schema/';
-import { HashedData, JwtPayload, Mail, encode, hashString, signJwt, validateHash } from '../core';
+import { HashedData, JwtPayload, encode, hashString, signJwt, validateHash } from '../core';
 import { EmailSubjects, ErrorMessages } from '../messages';
-import { LoggerService, MailService } from '.';
+import { LoggerService, Mail, MailService } from '.';
 
 @injectable()
 export class AuthService {
@@ -54,10 +54,8 @@ export class AuthService {
 
         const mail: Mail = {
             destinationAddresses: [user.email],
-            sourseAddress: String(process.env.MAIL_SENDER),
-            subject: EmailSubjects.VerifyEmail,
-            text: String(otpCode.code), // TODO: send beautiful message with code
-            senderName: String(process.env.MAIL_SENDER_NAME)
+            type: EMailType.VerifyAccount,
+            data: { otpCode }
         };
 
         try {
@@ -90,11 +88,10 @@ export class AuthService {
 
         const mail: Mail = {
             destinationAddresses: [user.email],
-            sourseAddress: String(process.env.MAIL_SENDER),
-            subject: EmailSubjects.VerifyEmail,
-            text: String(otpCode.code), // TODO: send beautiful text
-            senderName: String(process.env.MAIL_SENDER_NAME)
+            type: EMailType.VerifyAccount,
+            data: { otpCode }
         };
+
         await this.mailService.sendMail(mail);
 
         await this.userRepository.update(user.id, { otpCodes: [...user.otpCodes, otpCode] });
@@ -185,11 +182,10 @@ export class AuthService {
 
         const mail: Mail = {
             destinationAddresses: [user.email],
-            sourseAddress: String(process.env.MAIL_SENDER),
-            subject: EmailSubjects.PasswordReset,
-            text: String(otpCode.code), // TODO: make beautiful message
-            senderName: String(process.env.MAIL_SENDER_NAME)
+            type: EMailType.VerifyPasswordReset,
+            data: { otpCode }
         };
+
         await this.mailService.sendMail(mail);
 
         await this.userRepository.update(user.id, { otpCodes: [...user.otpCodes, otpCode] });

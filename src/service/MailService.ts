@@ -1,61 +1,47 @@
 import { inject, injectable } from 'inversify';
 import axios from 'axios';
+import { getRepository, Repository } from 'typeorm';
 
-import { Mail } from '../core';
 import { LoggerService } from '.';
+import { EMailType, MailType } from '../model';
+import { assert } from '../core';
+
+export interface Mail {
+    destinationAddresses: string[];
+    type: EMailType;
+    data: object;
+}
 
 @injectable()
 export class MailService {
-    private token: string | null;
+    private mailTypeRepository: Repository<MailType>;
 
     constructor(@inject('LoggerService') private logger: LoggerService) {
+        this.mailTypeRepository = getRepository(MailType);
     }
 
     public async sendMail(mail: Mail) {
-        if (!this.token) {
-            await this.updateToken();
-        }
+        const { title, text } = await this.buildMessage(mail.type, mail.data);
 
-        const body = {
-            email: {
-                html: Buffer.from(mail.html ?? '').toString('base64'),
-                text: mail.text,
-                subject: mail.subject,
-                from: {
-                    name: mail.senderName,
-                    email: mail.sourseAddress
-                },
-                to: mail.destinationAddresses.map((email) => ({ email })),
-            }
-        };
+        // TODO: send actual e-mail
 
-        const response = await axios.post(`https://api.sendpulse.com/smtp/emails`, body, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-            },
-        });
-
-        this.logger.info(`E-mail with subject '${mail.subject}' to user(s) ${mail.destinationAddresses.join(', ')}`);
+        this.logger.debug(`New e-mail for ${mail.destinationAddresses.join(', ')}:`);
+        this.logger.debug({ title, text });
     }
 
-    private async updateToken() {
-        const body = JSON.stringify({
-            grant_type: 'client_credentials',
-            client_id: process.env.SENDPULSE_ID,
-            client_secret: process.env.SENDPULSE_SECRET
+    public async buildMessage(type: EMailType, data: object): Promise<{ title: string; text: string }> {
+        const mailType = await this.mailTypeRepository.findOne({ code: type });
+
+        assert(!!mailType, 'mailType must be defined');
+
+        let title = mailType!.titleTemplate;
+        let text = mailType!.textTemplate;
+
+        Object.entries(data).forEach(([key, value]) => {
+            title = title.replace(new RegExp(`{${key}}`, "gi"), value);
+            text = text.replace(new RegExp(`{${key}}`, "gi"), value);
         });
 
-        const response = await axios.post(`https://api.sendpulse.com/oauth/access_token`, body, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-        });
-
-        this.token = response.data.access_token;
-
-        setTimeout(() => this.token = null, response.data.expires_in * 3 / 4);
+        return { title, text };
     }
 }
