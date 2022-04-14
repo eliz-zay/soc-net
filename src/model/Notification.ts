@@ -7,15 +7,9 @@ import {
     JoinColumn,
     ManyToOne,
 } from 'typeorm';
+import { NotificationType } from './NotificationType';
 
 import { User } from './User';
-
-export enum ENotificationType {
-    NewFollower = 'NewFollower',
-    NewDeal = 'NewDeal',
-    DealStatusChanged = 'DealStatusChanged',
-    NewDealMessage = 'NewDealMessage',
-}
 
 @Entity()
 export class Notification {
@@ -26,11 +20,18 @@ export class Notification {
     @JoinColumn({ name: 'user_id' })
     user: User;
 
-    @Column({ name: 'content', type: 'varchar', length: '256', nullable: false })
-    content: string;
+    @Column({ type: 'varchar', length: 100, nullable: false })
+    title: string;
 
-    @Column({ name: 'content_type', type: 'varchar', length: '50', nullable: false })
-    contentType: ENotificationType;
+    @Column({ type: 'varchar', length: 500, nullable: false })
+    text: string;
+
+    @Column({ type: 'json', nullable: false, default: '{}' })
+    data: object;
+
+    @ManyToOne(() => NotificationType, { nullable: false })
+    @JoinColumn({ name: 'notification_code', referencedColumnName: 'code' })
+    type: NotificationType;
 
     @Column({ name: 'read_at', type: 'timestamp', nullable: true })
     readAt?: Date;
