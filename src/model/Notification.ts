@@ -10,9 +10,11 @@ import {
 
 import { User } from './User';
 
-export enum ContentType {
-    Deal = 'Deal',
-    Followers = 'Followers'
+export enum ENotificationType {
+    NewFollower = 'NewFollower',
+    NewDeal = 'NewDeal',
+    DealStatusChanged = 'DealStatusChanged',
+    NewDealMessage = 'NewDealMessage',
 }
 
 @Entity()
@@ -20,18 +22,18 @@ export class Notification {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.notifications)
+    @ManyToOne(() => User, (user) => user.notifications, { nullable: false })
     @JoinColumn({ name: 'user_id' })
     user: User;
 
     @Column({ name: 'content', type: 'varchar', length: '256', nullable: false })
     content: string;
 
-    @Column({ name: 'content_type', type: 'enum', enum: ContentType, nullable: false })
-    contentType: ContentType;
+    @Column({ name: 'content_type', type: 'varchar', length: '50', nullable: false })
+    contentType: ENotificationType;
 
-    @Column({ name: 'read_at', type: 'timestamp' })
-    readAt: Date;
+    @Column({ name: 'read_at', type: 'timestamp', nullable: true })
+    readAt?: Date;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
@@ -42,7 +44,7 @@ export class Notification {
     @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
     deletedAt?: Date;
 
-    constructor(partial: Partial<User>) {
+    constructor(partial: Partial<Notification>) {
         Object.assign(this, partial);
     }
 }

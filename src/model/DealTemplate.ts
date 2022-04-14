@@ -15,7 +15,7 @@ export class DealTemplate {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.dealTemplates)
+    @ManyToOne(() => User, (user) => user.dealTemplates, { nullable: false })
     @JoinColumn({ name: 'user_id' })
     user: User;
 

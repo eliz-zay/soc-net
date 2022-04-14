@@ -6,9 +6,10 @@ import {
     UpdateDateColumn,
     JoinColumn,
     ManyToOne,
+    OneToMany,
 } from 'typeorm';
 
-import { User, DealTemplate } from './';
+import { User, DealTemplate, Post } from './';
 
 export enum EDealState {
     Proposal = 'Proposal',
@@ -21,7 +22,7 @@ export enum EDealState {
 
 export enum EDealMessageSender {
     Agent = 'Agent',
-    Blogeer = 'Blogger'
+    Blogger = 'Blogger'
 }
 
 export enum EDealAttachmentType {
@@ -66,6 +67,9 @@ export class Deal {
 
     @Column({ type: 'json', array: true, nullable: false, default: [] })
     chat: DealMessage[];
+
+    @OneToMany(() => Post, (post) => post.deal)
+    posts: Post[];
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;

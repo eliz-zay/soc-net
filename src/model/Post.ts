@@ -11,15 +11,16 @@ import {
 
 import { User } from './User';
 import { PostGroup } from './PostGroup';
+import { Deal } from './Deal';
 
-export enum MediaType {
+export enum EMediaType {
     Photo = 'Photo',
     Video = 'Video',
     Audio = 'Audio'
 }
 
 export class MediaUrls {
-    type: MediaType;
+    type: EMediaType;
     url: string;
 }
 
@@ -33,7 +34,7 @@ export class Post {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.posts)
+    @ManyToOne(() => User, (user) => user.posts, { nullable: false })
     @JoinColumn({ name: 'user_id' })
     user: User;
 
@@ -46,9 +47,11 @@ export class Post {
     @Column({ name: 'comments', type: 'json', array: true, nullable: false, default: [] })
     comments: Comment[];
 
-    // TODO: user_deal_id
+    @ManyToOne(() => Deal, (deal) => deal.posts)
+    @JoinColumn({ name: 'deal_id' })
+    deal?: Deal;
 
-    @ManyToOne(() => PostGroup, (group) => group.posts)
+    @ManyToOne(() => PostGroup, (group) => group.posts, { nullable: false })
     @JoinColumn({ name: 'post_group_id' })
     postGroup: PostGroup;
 
@@ -64,7 +67,7 @@ export class Post {
     @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
     deletedAt?: Date;
 
-    constructor(partial: Partial<User>) {
+    constructor(partial: Partial<Post>) {
         Object.assign(this, partial);
     }
 }
