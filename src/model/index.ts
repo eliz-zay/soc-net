@@ -7,3 +7,7 @@ export * from './PostGroup';
 export * from './PostAd';
 export * from './Subscription';
 export * from './UserSubscription';
+export * from './NotificationType';
+export * from './MobileToken';
+export * from './MailType';
+export * from './Deal';
