@@ -4,3 +4,6 @@ export * from './DealTemplate';
 export * from './Notification';
 export * from './Post';
 export * from './PostGroup';
+export * from './PostAd';
+export * from './Subscription';
+export * from './UserSubscription';
