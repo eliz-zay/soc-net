@@ -1,8 +1,7 @@
 import express from 'express';
 import { ApiOperationDelete, ApiOperationGet, ApiOperationPost, ApiPath } from 'swagger-express-ts';
-import { interfaces, controller, httpPost, requestBody, request, httpGet } from 'inversify-express-utils';
+import { interfaces, controller, httpPost, requestBody, request, httpGet, httpDelete } from 'inversify-express-utils';
 import { inject } from 'inversify';
-import { makeValidateBody } from 'express-class-validator';
 
 import { AuthService } from './../service/';
 import {
@@ -16,7 +15,8 @@ import {
     UserResponse,
     ChangePasswordRequest
 } from './../schema/';
-import { JwtPayload } from '../core';
+import { JwtPayload, makeValidateBody } from '../core';
+import { checkIfUserActivated } from './middlewares';
 
 @ApiPath({
     path: "/auth",
@@ -60,7 +60,7 @@ export class AuthController implements interfaces.Controller {
     @ApiOperationGet({
         path: '/user-info',
         responses: { 200: { model: "UserResponse" } },
-        security: { 'Api-Token': [], 'Authorization': [] }
+        security: { 'Api-Key': [], 'Authorization': [] }
     })
     @httpGet('/user-info')
     private async userInfo(@request() req: express.Request & { user: JwtPayload }): Promise<UserResponse> {
@@ -75,7 +75,7 @@ export class AuthController implements interfaces.Controller {
     @ApiOperationGet({
         path: '/request-email-verification',
         responses: { 200: { model: "SuccessResponse" } },
-        security: { 'Api-Token': [], 'Authorization': [] }
+        security: { 'Api-Key': [], 'Authorization': [] }
     })
     @httpGet('/request-email-verification')
     private async requestEmailVerification(@request() req: any): Promise<SuccessResponse> {
@@ -86,7 +86,7 @@ export class AuthController implements interfaces.Controller {
         path: '/verify-email',
         parameters: { body: { required: true, model: "VerifyEmailRequest" } },
         responses: { 200: { model: "SuccessResponse" } },
-        security: { 'Api-Token': [], 'Authorization': [] }
+        security: { 'Api-Key': [], 'Authorization': [] }
     })
     @httpPost('/verify-email', makeValidateBody(VerifyEmailRequest))
     private async verifyEmail(
@@ -124,7 +124,7 @@ export class AuthController implements interfaces.Controller {
         path: '/change-password',
         parameters: { body: { required: true, model: "ChangePasswordRequest" } },
         responses: { 200: { model: "SuccessResponse" } },
-        security: { 'Api-Token': [], 'Authorization': [] }
+        security: { 'Api-Key': [], 'Authorization': [] }
     })
     @httpPost('/reset-password', makeValidateBody(ChangePasswordRequest))
     private async changePassword(
@@ -135,11 +135,12 @@ export class AuthController implements interfaces.Controller {
     }
 
     @ApiOperationDelete({
-        path: '/delete',
+        path: '/',
         parameters: {},
-        responses: { 200: { model: "SuccessResponse" } }
+        responses: { 200: { model: "SuccessResponse" } },
+        security: { 'Api-Key': [], 'Authorization': [] }
     })
-    @httpPost('/delete')
+    @httpDelete('/', checkIfUserActivated())
     private async delete(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponse> {
         return await this.authService.deleteUser(req.user);
     }

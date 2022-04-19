@@ -18,7 +18,7 @@ import {
     ChangePasswordRequest
 } from '../schema/';
 import { HashedData, JwtPayload, encode, hashString, signJwt, validateHash } from '../core';
-import { EmailSubjects, ErrorMessages } from '../messages';
+import { ErrorMessages } from '../messages';
 import { LoggerService, Mail, MailService } from '.';
 
 @injectable()
@@ -55,7 +55,7 @@ export class AuthService {
         const mail: Mail = {
             destinationAddresses: [user.email],
             type: EMailType.VerifyAccount,
-            data: { otpCode }
+            data: { code: otpCode.code }
         };
 
         try {
@@ -89,7 +89,7 @@ export class AuthService {
         const mail: Mail = {
             destinationAddresses: [user.email],
             type: EMailType.VerifyAccount,
-            data: { otpCode }
+            data: { code: otpCode.code }
         };
 
         await this.mailService.sendMail(mail);
@@ -183,7 +183,7 @@ export class AuthService {
         const mail: Mail = {
             destinationAddresses: [user.email],
             type: EMailType.VerifyPasswordReset,
-            data: { otpCode }
+            data: { code: otpCode.code }
         };
 
         await this.mailService.sendMail(mail);
@@ -250,8 +250,7 @@ export class AuthService {
     private async generateJwt(user: User): Promise<string> {
         const jwtPayload: JwtPayload = {
             id: user.id,
-            email: user.email,
-            isEmailVerified: !!user.emailVerifiedAt,
+            email: user.email
         };
 
         const jwtToken: string = await signJwt(jwtPayload, process.env.JWT_SECRET ?? 'secret');

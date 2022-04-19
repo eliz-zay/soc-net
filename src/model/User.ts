@@ -61,7 +61,7 @@ export class User {
     @Column({ name: 'referrals_count', type: 'int', nullable: false, default: 0 })
     referralsСount: number;
 
-    @Column({ name: 'otp_codes', type: 'json', array: true, nullable: false, default: [] })
+    @Column({ name: 'otp_codes', type: 'json', nullable: false, default: [] })
     otpCodes: OtpCode[];
 
     @Column({ type: 'varchar', length: '30', nullable: false })
@@ -76,14 +76,14 @@ export class User {
     @Column({ type: 'int', nullable: true })
     age?: number;
 
-    @Column({ name: 'country_id', type: 'int', nullable: false })
+    @Column({ name: 'country_id', type: 'int', nullable: true })
     countryId: number;
 
     @ManyToOne(() => Geo, { nullable: false })
     @JoinColumn({ name: "country_id" })
     country?: Geo;
 
-    @Column({ name: 'region_id', type: 'int', nullable: false })
+    @Column({ name: 'region_id', type: 'int', nullable: true })
     regionId: number;
 
     @ManyToOne(() => Geo, { nullable: false })
@@ -97,10 +97,10 @@ export class User {
     @JoinColumn({ name: "city_id" })
     city?: Geo;
 
-    @Column({ name: 'profile_filling_stage', type: 'enum', enum: EProfileFillingStage, nullable: true })
-    profileFillingStage?: EProfileFillingStage;
+    @Column({ name: 'profile_filling_stage', type: 'enum', enum: EProfileFillingStage, nullable: false, default: EProfileFillingStage.PersonalInfo })
+    profileFillingStage: EProfileFillingStage;
 
-    @Column({ name: 'visible_for_ad_proposal', type: 'boolean', nullable: false })
+    @Column({ name: 'visible_for_ad_proposal', type: 'boolean', nullable: false, default: true })
     visibleForAdProposal: boolean;
 
     @Column({ name: 'basic_description', type: 'varchar', length: '200', nullable: true })

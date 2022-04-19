@@ -8,8 +8,8 @@ export const ErrorMessages = Object.freeze({
         httpCode: 500
     }),
     UserWithGivenEmailExists: new ErrorSchema({
-        title: 'Пользлватель с такой почтой уже существует',
-        message: 'Пользлватель с такой почтой уже существует',
+        title: 'Пользователь с такой почтой уже существует',
+        message: 'Пользователь с такой почтой уже существует',
         code: 2
     }),
     IncorrectApiKey: new ErrorSchema({
@@ -78,5 +78,10 @@ export const ErrorMessages = Object.freeze({
         title: 'Пользователь уже имеет данную роль',
         message: 'Пользователь уже имеет данную роль',
         code: 15
+    }),
+    YouMustVerifyAndFillYourAccount: new ErrorSchema({
+        title: 'Для этого действия требуется подтверждение и заполнение профиля',
+        message: 'Для этого действия требуется подтверждение и заполнение профиля',
+        code: 16
     })
 });

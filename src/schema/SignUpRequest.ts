@@ -14,6 +14,11 @@ export class SignUpRequest {
     @ApiModelProperty({ required: true })
     email: string;
 
+    @IsAlphanumeric()
+    @MaxLength(40)
+    @ApiModelProperty({ required: true })
+    username: string;
+
     @IsString()
     @ApiModelProperty({ required: true })
     password: string;

@@ -11,7 +11,7 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 
 import * as swagger from "swagger-express-ts";
 
-import { createDbConnection, apiTokenMiddleware } from './core';
+import { createDbConnection, apiTokenMiddleware, initDiContainer } from './core';
 import { ErrorMessages } from './messages';
 
 import "./controller/";
@@ -30,11 +30,11 @@ async function bootstrapServer() {
 
     await createDbConnection();
 
-    const container = new Container();
-
-    container.bind<AuthService>('AuthService').to(AuthService);
-    container.bind<MailService>('MailService').to(MailService);
-    container.bind<LoggerService>('LoggerService').to(LoggerService);
+    const container = initDiContainer((mContainer: Container) => {
+        mContainer.bind<AuthService>('AuthService').to(AuthService);
+        mContainer.bind<MailService>('MailService').to(MailService);
+        mContainer.bind<LoggerService>('LoggerService').to(LoggerService);
+    });
 
     const expressServer = new InversifyExpressServer(container, null, { rootPath: "/api" });
 
@@ -102,7 +102,7 @@ function setExpressErrorHandler(loggerService: LoggerService) {
                 res.status(500).send(ErrorMessages.InternalError.preview());
             }
         });
-    }
+    };
 }
 
 bootstrapServer();
