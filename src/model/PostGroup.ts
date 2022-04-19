@@ -8,10 +8,10 @@ import {
     ManyToOne,
     OneToMany,
     ManyToMany,
+    OneToOne,
 } from 'typeorm';
 
-import { Post } from './Post';
-import { User } from './User';
+import { Post, User, UserSubscription } from './';
 
 export enum EViewType {
     Grid = 'Grid',
@@ -48,7 +48,9 @@ export class PostGroup {
     @ManyToMany(() => User, (user) => user.joinedPrivateGroups)
     joinedUsers: User[];
 
-    // TODO: user_subscription_id
+    @OneToOne(() => UserSubscription, { nullable: true })
+    @JoinColumn({ name: 'user_subscription_id' })
+    userSubscription?: UserSubscription;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
