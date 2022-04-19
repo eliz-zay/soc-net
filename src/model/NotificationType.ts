@@ -17,7 +17,6 @@ export enum ENotificationType {
     DealDiscussion = 'DealDiscussion',
     DealWaitingPost = 'DealWaitingPost',
     DealWaitingPayment = 'DealWaitingPayment',
-    NewDealMessage = 'NewDealMessage',
 }
 
 @Entity()
@@ -28,8 +27,8 @@ export class NotificationType {
     @Column({ name: 'title_template', type: 'varchar', length: 100, nullable: false })
     titleTemplate: string;
 
-    @Column({ name: 'text_template', type: 'varchar', length: 500, nullable: false })
-    textTemplate: string;
+    @Column({ name: 'text_template', type: 'varchar', length: 500, nullable: true })
+    textTemplate?: string;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;

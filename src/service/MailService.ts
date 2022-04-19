@@ -1,5 +1,4 @@
 import { inject, injectable } from 'inversify';
-import axios from 'axios';
 import { getRepository, Repository } from 'typeorm';
 
 import { LoggerService } from '.';
