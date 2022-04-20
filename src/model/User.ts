@@ -40,6 +40,9 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ type: 'varchar', length: '30', nullable: false })
+    username: string;
+
     @Column({ name: 'email', type: 'varchar', length: '100', nullable: false })
     email: string;
 
@@ -64,17 +67,14 @@ export class User {
     @Column({ name: 'otp_codes', type: 'json', nullable: false, default: [] })
     otpCodes: OtpCode[];
 
-    @Column({ type: 'varchar', length: '30', nullable: false })
-    username: string;
-
     @Column({ name: 'photo_url', type: 'varchar', length: '500', nullable: true })
     photoUrl?: string;
 
     @Column({ type: 'enum', enum: EUserGender, nullable: true })
     gender?: EUserGender;
 
-    @Column({ type: 'int', nullable: true })
-    age?: number;
+    @Column({ type: 'date', nullable: true })
+    birthday?: Date;
 
     @Column({ name: 'country_id', type: 'int', nullable: true })
     countryId: number;

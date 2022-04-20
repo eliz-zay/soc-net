@@ -8,10 +8,9 @@ import {
 
 @ApiModel()
 export class SignInRequest {
-    @IsEmail()
     @MaxLength(40)
     @ApiModelProperty({ required: true })
-    email: string;
+    emailOrUsername: string;
 
     @IsString()
     @ApiModelProperty({ required: true })

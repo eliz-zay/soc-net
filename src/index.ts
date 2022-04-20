@@ -4,11 +4,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import compression from 'compression';
 import jwt from 'express-jwt';
-
 import 'reflect-metadata';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
-
 import * as swagger from "swagger-express-ts";
 
 import { createDbConnection, apiTokenMiddleware, initDiContainer } from './core';
@@ -20,7 +18,9 @@ import "./schema/";
 import {
     AuthService,
     MailService,
-    LoggerService
+    LoggerService,
+    UserInfoService,
+    StorageService
 } from './service';
 
 import { ErrorSchema } from './schema/';
@@ -32,7 +32,9 @@ async function bootstrapServer() {
 
     const container = initDiContainer((mContainer: Container) => {
         mContainer.bind<AuthService>('AuthService').to(AuthService);
+        mContainer.bind<UserInfoService>('UserInfoService').to(UserInfoService);
         mContainer.bind<MailService>('MailService').to(MailService);
+        mContainer.bind<StorageService>('StorageService').to(StorageService);
         mContainer.bind<LoggerService>('LoggerService').to(LoggerService);
     });
 

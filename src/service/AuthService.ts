@@ -78,7 +78,7 @@ export class AuthService {
         const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
 
         if (!user) {
-            throw ErrorMessages.UserWithGivenEmailDoesntExist;
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
         if (user.emailVerifiedAt) {
             throw ErrorMessages.EmailAlreadyVerified;
@@ -119,18 +119,21 @@ export class AuthService {
 
         const user = await this.userRepository.findOne({ id, deletedAt: IsNull() });
         if (!user) {
-            throw ErrorMessages.UserWithGivenEmailDoesntExist;
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
         return transformToUserSchema(user);
     }
 
     public async signIn(signInRequest: SignInRequest): Promise<LoggedInUserSchema> {
-        const { email, password } = signInRequest;
+        const { emailOrUsername, password } = signInRequest;
 
-        const user = await this.userRepository.findOne({ email, deletedAt: IsNull() });
+        const user = emailOrUsername.includes('@')
+            ? await this.userRepository.findOne({ email: emailOrUsername, deletedAt: IsNull() })
+            : await this.userRepository.findOne({ username: emailOrUsername, deletedAt: IsNull() });
+
         if (!user) {
-            throw ErrorMessages.UserWithGivenEmailDoesntExist;
+            throw ErrorMessages.EmailOrUsernameIncorrect;
         }
 
         const isPassportValid = await validateHash(password, user.salt, user.passHash);
@@ -237,7 +240,7 @@ export class AuthService {
 
         const user = await this.userRepository.findOne({ id, deletedAt: IsNull() });
         if (!user) {
-            throw ErrorMessages.UserWithGivenEmailDoesntExist;
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
         await this.userRepository.update(user.id, { deletedAt: moment.utc().toDate() });

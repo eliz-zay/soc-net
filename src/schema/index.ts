@@ -1,13 +1,15 @@
 export * from './SignInRequest';
 export * from './SignUpRequest';
 export * from './VerifyEmailRequest';
-export * from './SuccessResponse';
 export * from './RequestPasswordResetRequest';
 export * from './ResetPasswordRequest';
 export * from './CheckOtpCodeRequest';
+export * from './ChangePasswordRequest';
+export * from './PersonalInfoRequest';
+
 export * from './UserSchema';
 export * from './ErrorSchema';
-export * from './ChangePasswordRequest';
 
 export * from './LoggedInUserResponse';
 export * from './UserResponse';
+export * from './SuccessResponse';

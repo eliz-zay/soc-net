@@ -11,12 +11,16 @@ export function checkIfUserActivated() {
 
         assert(!!authService, 'AuthService from DI container can\'t be null');
 
-        const user = await authService.getUserInfo(req.user);
+        try {
+            const user = await authService.getUserInfo(req.user);
 
-        if (!user.isEmailVerified || user.profileFillingStage !== EProfileFillingStage.Filled) {
-            return next(ErrorMessages.YouMustVerifyAndFillYourAccount);
+            if (!user.isEmailVerified || user.profileFillingStage !== EProfileFillingStage.Filled) {
+                return next(ErrorMessages.YouMustVerifyAndFillYourAccount);
+            }
+
+            return next();
+        } catch (error) {
+            return next(error);
         }
-
-        return next();
     };
 }

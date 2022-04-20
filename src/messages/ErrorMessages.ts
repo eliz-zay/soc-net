@@ -83,5 +83,35 @@ export const ErrorMessages = Object.freeze({
         title: 'Для этого действия требуется подтверждение и заполнение профиля',
         message: 'Для этого действия требуется подтверждение и заполнение профиля',
         code: 16
+    }),
+    EmailOrUsernameIncorrect: new ErrorSchema({
+        title: 'Неверно введен email или логин',
+        message: 'Неверно введен email или логин',
+        code: 17
+    }),
+    UserAlreadyFilledPersonalInfo: new ErrorSchema({
+        title: 'Пользователь уже заполнен персональную информацию',
+        message: 'Пользователь уже заполнен персональную информацию',
+        code: 18
+    }),
+    GeoWithGivenIdDoesntExist: new ErrorSchema({
+        title: 'Геолокация с заданным ID не существует',
+        message: 'Геолокация с заданным ID не существует',
+        code: 19
+    }),
+    RegionFromWrongCountry: new ErrorSchema({
+        title: 'Регион не относится к выбранной вами стране',
+        message: 'Регион не относится к выбранной вами стране',
+        code: 20
+    }),
+    CityFromWrongRegion: new ErrorSchema({
+        title: 'Город не относится к выбранному вами региону',
+        message: 'Город не относится к выбранному вами региону',
+        code: 21
+    }),
+    GeoHasWroingRange: new ErrorSchema({
+        title: 'Выбранная геолокация имеет неверный диапазон',
+        message: 'Выбранная геолокация имеет неверный диапазон',
+        code: 22
     })
 });
