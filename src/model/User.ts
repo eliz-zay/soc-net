@@ -35,6 +35,24 @@ export enum EProfileFillingStage {
     Filled = 'Filled'
 }
 
+export enum EOccupation {
+    Student = 'Student',
+    Working = 'Working',
+    Blogger = 'Blogger',
+    Businessman = 'Businessman',
+    Company = 'Company'
+}
+
+export enum EHobby {
+    IT = 'IT',
+    Cooking = 'Cooking',
+    Travelling = 'Travelling',
+    Architecture = 'Architecture',
+    Art = 'Art',
+    Music = 'Music',
+    Business = 'Business'
+}
+
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -99,6 +117,12 @@ export class User {
 
     @Column({ name: 'profile_filling_stage', type: 'enum', enum: EProfileFillingStage, nullable: false, default: EProfileFillingStage.PersonalInfo })
     profileFillingStage: EProfileFillingStage;
+
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    occupation: EOccupation;
+
+    @Column({ type: 'varchar', length: 50, array: true, nullable: true })
+    hobbies: EHobby[];
 
     @Column({ name: 'visible_for_ad_proposal', type: 'boolean', nullable: false, default: true })
     visibleForAdProposal: boolean;

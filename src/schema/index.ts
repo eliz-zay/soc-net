@@ -6,6 +6,7 @@ export * from './ResetPasswordRequest';
 export * from './CheckOtpCodeRequest';
 export * from './ChangePasswordRequest';
 export * from './PersonalInfoRequest';
+export * from './PreferencesRequest';
 
 export * from './UserSchema';
 export * from './ErrorSchema';

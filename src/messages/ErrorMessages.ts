@@ -90,8 +90,8 @@ export const ErrorMessages = Object.freeze({
         code: 17
     }),
     UserAlreadyFilledPersonalInfo: new ErrorSchema({
-        title: 'Пользователь уже заполнен персональную информацию',
-        message: 'Пользователь уже заполнен персональную информацию',
+        title: 'Пользователь уже заполнил персональную информацию',
+        message: 'Пользователь уже заполнил персональную информацию',
         code: 18
     }),
     GeoWithGivenIdDoesntExist: new ErrorSchema({
@@ -113,5 +113,10 @@ export const ErrorMessages = Object.freeze({
         title: 'Выбранная геолокация имеет неверный диапазон',
         message: 'Выбранная геолокация имеет неверный диапазон',
         code: 22
-    })
+    }),
+    UserAlreadyFilledPreferences: new ErrorSchema({
+        title: 'Пользователь уже заполнил настройки',
+        message: 'Пользователь уже заполнил настройки',
+        code: 23
+    }),
 });

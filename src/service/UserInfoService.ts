@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
 
 import { EGeoRange, EProfileFillingStage, Geo, User } from '../model';
-import { PersonalInfoRequest } from '../schema';
+import { PersonalInfoRequest, PreferencesRequest } from '../schema';
 import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
@@ -104,5 +104,34 @@ export class UserInfoService {
         const photoUrl = await this.storageService.upload(photo.originalname, photo.mimetype, photo.buffer);
 
         await this.userRepository.update(jwtPayload.id, { photoUrl });
+    }
+
+    async addPreferences(jwtPayload: JwtPayload, payload: PreferencesRequest): Promise<void> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        if (user.profileFillingStage !== EProfileFillingStage.Preferences) {
+            throw ErrorMessages.UserAlreadyFilledPreferences;
+        }
+
+        const { visibleForAdProposal, businessDescription, occupation, hobbies } = payload;
+
+        await this.userRepository.update(
+            user.id,
+            {
+                visibleForAdProposal,
+                businessDescription,
+                occupation,
+                hobbies,
+                profileFillingStage: EProfileFillingStage.Filled
+            }
+        );
     }
 }

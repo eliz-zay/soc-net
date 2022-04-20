@@ -5,7 +5,7 @@ import { interfaces, controller, httpPost, requestBody, request, httpGet, httpDe
 import { inject } from 'inversify';
 
 import { UserInfoService } from '../service';
-import { PersonalInfoRequest, SuccessResponse } from '../schema';
+import { PersonalInfoRequest, PreferencesRequest, SuccessResponse } from '../schema';
 import { JwtPayload, makeValidateBody } from '../core';
 import { checkIfUserActivated } from './middlewares';
 import { ErrorMessages } from '../messages';
@@ -53,6 +53,21 @@ export class UserInfoController implements interfaces.Controller {
         }
 
         await this.userInfoService.addProfilePhoto(req.user, file);
+
+        return { success: true };
+    }
+
+    @ApiOperationPost({
+        path: '/preferences',
+        parameters: { body: { required: true, model: "PreferencesRequest" } },
+        responses: { 200: { model: "SuccessResponse" } }
+    })
+    @httpPost('/preferences', makeValidateBody(PreferencesRequest))
+    private async addPreferences(
+        @request() req: express.Request & { user: JwtPayload },
+        @requestBody() body: PreferencesRequest
+    ): Promise<SuccessResponse> {
+        await this.userInfoService.addPreferences(req.user, body);
 
         return { success: true };
     }

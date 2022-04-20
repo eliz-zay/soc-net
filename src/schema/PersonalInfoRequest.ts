@@ -1,6 +1,6 @@
 import { ApiModel, ApiModelProperty } from 'swagger-express-ts';
 
-import { IsEnum, IsInt, IsOptional, IsString, Matches } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, Matches } from 'class-validator';
 import { EUserGender } from '../model';
 
 @ApiModel()
