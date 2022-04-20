@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
-import multer from 'multer';
 
 import { EGeoRange, EProfileFillingStage, Geo, User } from '../model';
 import { PersonalInfoRequest } from '../schema';
