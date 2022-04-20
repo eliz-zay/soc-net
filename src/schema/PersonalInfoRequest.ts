@@ -23,6 +23,6 @@ export class PersonalInfoRequest {
 
     @IsOptional()
     @IsInt()
-    @ApiModelProperty({ required: true })
-    cityId: number;
+    @ApiModelProperty({ required: false })
+    cityId?: number;
 }

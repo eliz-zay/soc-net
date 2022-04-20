@@ -1,13 +1,12 @@
 import express from 'express';
 import multer from 'multer';
-import { ApiOperationDelete, ApiOperationGet, ApiOperationPatch, ApiOperationPost, ApiPath, SwaggerDefinitionConstant } from 'swagger-express-ts';
-import { interfaces, controller, httpPost, requestBody, request, httpGet, httpDelete, httpPatch } from 'inversify-express-utils';
+import { ApiOperationGet, ApiOperationPatch, ApiOperationPost, ApiPath } from 'swagger-express-ts';
+import { interfaces, controller, httpPost, requestBody, request, httpGet, httpPatch } from 'inversify-express-utils';
 import { inject } from 'inversify';
 
 import { UserInfoService } from '../service';
-import { PersonalInfoRequest, PreferencesRequest, SuccessResponse } from '../schema';
+import { PersonalInfoRequest, UserInfoPatchRequest, PreferencesRequest, SuccessResponse, UserInfoResponse } from '../schema';
 import { JwtPayload, makeValidateBody } from '../core';
-import { checkIfUserActivated } from './middlewares';
 import { ErrorMessages } from '../messages';
 
 @ApiPath({
@@ -70,5 +69,32 @@ export class UserInfoController implements interfaces.Controller {
         await this.userInfoService.addPreferences(req.user, body);
 
         return { success: true };
+    }
+
+    @ApiOperationPatch({
+        path: '/',
+        parameters: { body: { required: true, model: "UserInfoPatchRequest" } },
+        responses: { 200: { model: "SuccessResponse" } }
+    })
+    @httpPatch('/', makeValidateBody(UserInfoPatchRequest))
+    private async update(
+        @request() req: express.Request & { user: JwtPayload },
+        @requestBody() body: UserInfoPatchRequest
+    ): Promise<SuccessResponse> {
+        await this.userInfoService.update(req.user, body);
+
+        return { success: true };
+    }
+
+    @ApiOperationGet({
+        path: '/',
+        parameters: {},
+        responses: { 200: { model: "UserInfoResponse" } }
+    })
+    @httpGet('/')
+    private async get(@request() req: express.Request & { user: JwtPayload }): Promise<UserInfoResponse> {
+        const userInfo = await this.userInfoService.get(req.user);
+
+        return { success: true, data: { userInfo } };
     }
 }

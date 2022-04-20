@@ -12,7 +12,7 @@ export class PreferencesRequest {
     @IsOptional()
     @IsString()
     @ApiModelProperty({ required: false })
-    businessDescription: string;
+    businessDescription?: string;
 
     @IsEnum(EOccupation)
     @ApiModelProperty({ required: true, enum: Object.values(EOccupation).filter((value) => typeof value === 'string') })

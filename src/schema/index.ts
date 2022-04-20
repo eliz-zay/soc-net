@@ -7,6 +7,7 @@ export * from './CheckOtpCodeRequest';
 export * from './ChangePasswordRequest';
 export * from './PersonalInfoRequest';
 export * from './PreferencesRequest';
+export * from './UserInfoPatchRequest';
 
 export * from './UserSchema';
 export * from './ErrorSchema';
@@ -14,3 +15,4 @@ export * from './ErrorSchema';
 export * from './LoggedInUserResponse';
 export * from './UserResponse';
 export * from './SuccessResponse';
+export * from './UserInfoResponse';

@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
 
 import { EGeoRange, EProfileFillingStage, Geo, User } from '../model';
-import { PersonalInfoRequest, PreferencesRequest } from '../schema';
+import { PersonalInfoRequest, UserInfoPatchRequest, PreferencesRequest, UserInfoSchema, transformToUserInfoSchema } from '../schema';
 import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
@@ -133,5 +133,43 @@ export class UserInfoService {
                 profileFillingStage: EProfileFillingStage.Filled
             }
         );
+    }
+
+    async update(jwtPayload: JwtPayload, payload: UserInfoPatchRequest) {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        const { visibleForAdProposal } = payload;
+
+        await this.userRepository.update(
+            user.id,
+            {
+                visibleForAdProposal
+            }
+        );
+    }
+
+    async get(jwtPayload: JwtPayload): Promise<UserInfoSchema> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({
+            where: { id: jwtPayload.id, deletedAt: IsNull() },
+            relations: ['country', 'region', 'city']
+        });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        return transformToUserInfoSchema(user);
     }
 }
