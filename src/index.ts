@@ -20,7 +20,8 @@ import {
     MailService,
     LoggerService,
     UserInfoService,
-    StorageService
+    StorageService,
+    PostGroupService
 } from './service';
 
 import { ErrorSchema } from './schema/';
@@ -36,6 +37,7 @@ async function bootstrapServer() {
         mContainer.bind<MailService>('MailService').to(MailService);
         mContainer.bind<StorageService>('StorageService').to(StorageService);
         mContainer.bind<LoggerService>('LoggerService').to(LoggerService);
+        mContainer.bind<PostGroupService>('PostGroupService').to(PostGroupService);
     });
 
     const expressServer = new InversifyExpressServer(container, null, { rootPath: "/api" });

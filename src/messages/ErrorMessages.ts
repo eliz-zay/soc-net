@@ -119,4 +119,14 @@ export const ErrorMessages = Object.freeze({
         message: 'Пользователь уже заполнил настройки',
         code: 23
     }),
+    GroupNamesCantBeEqual: new ErrorSchema({
+        title: 'Имена групп не могут совпадать',
+        message: 'Имена групп не могут совпадать',
+        code: 24
+    }),
+    MaxGroupsCountReached: new ErrorSchema({
+        title: 'Вы достигли максимального количества групп',
+        message: 'Вы достигли максимального количества групп',
+        code: 25
+    }),
 });

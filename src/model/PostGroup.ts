@@ -19,6 +19,7 @@ export enum EGroupViewType {
 }
 
 export const KDefaultPostGroupName = 'Группа 1';
+export const KMaxGroupsPerUser = 6;
 
 @Entity()
 export class PostGroup {
@@ -28,6 +29,9 @@ export class PostGroup {
     @ManyToOne(() => User, (user) => user.groups, { nullable: false })
     @JoinColumn({ name: 'user_id' })
     user: User;
+
+    @Column({ name: 'user_id', type: 'int', nullable: false })
+    userId: number;
 
     @Column({ name: 'name', type: 'varchar', length: '64', nullable: false })
     name: string;

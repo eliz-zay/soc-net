@@ -8,6 +8,7 @@ export * from './ChangePasswordRequest';
 export * from './PersonalInfoRequest';
 export * from './PreferencesRequest';
 export * from './UserInfoPatchRequest';
+export * from './AddGroupRequest';
 
 export * from './UserSchema';
 export * from './ErrorSchema';
@@ -16,3 +17,4 @@ export * from './LoggedInUserResponse';
 export * from './UserResponse';
 export * from './SuccessResponse';
 export * from './UserInfoResponse';
+export * from './CreatedEntityResponse';
