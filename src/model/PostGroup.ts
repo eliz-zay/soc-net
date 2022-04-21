@@ -13,10 +13,12 @@ import {
 
 import { Post, User, UserSubscription } from './';
 
-export enum EViewType {
+export enum EGroupViewType {
     Grid = 'Grid',
     TextBlog = 'TextBlog'
 }
+
+export const KDefaultPostGroupName = 'Группа 1';
 
 @Entity()
 export class PostGroup {
@@ -36,8 +38,8 @@ export class PostGroup {
     @Column({ name: 'order_number', type: 'int', nullable: true })
     orderNumber: number;
 
-    @Column({ name: 'view_type', type: 'enum', enum: EViewType, nullable: false })
-    viewType: EViewType;
+    @Column({ name: 'view_type', type: 'enum', enum: EGroupViewType, nullable: false })
+    viewType: EGroupViewType;
 
     @Column({ name: 'is_private', type: 'boolean', nullable: false, default: false })
     isPrivate: boolean;
