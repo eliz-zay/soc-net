@@ -129,4 +129,19 @@ export const ErrorMessages = Object.freeze({
         message: 'Вы достигли максимального количества групп',
         code: 25
     }),
+    UserWithGivenUsernameExists: new ErrorSchema({
+        title: 'Пользователь с таким логином уже существует',
+        message: 'Пользователь с таким логином уже существует',
+        code: 26
+    }),
+    PostGroupDoesntExist: new ErrorSchema({
+        title: 'Группы постов с таким ID не существует',
+        message: 'Группы постов с таким ID не существует',
+        code: 27
+    }),
+    UserDoesntOwnThisPostGroup: new ErrorSchema({
+        title: 'У вас нет группы постов с таким ID',
+        message: 'У вас нет группы постов с таким ID',
+        code: 28
+    })
 });

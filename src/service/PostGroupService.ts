@@ -2,10 +2,11 @@ import { inject, injectable } from "inversify";
 import { getRepository, IsNull, Repository } from "typeorm";
 
 import { KDefaultPostGroupName, KMaxGroupsPerUser, PostGroup, User } from '../model';
-import { AddGroupRequest } from '../schema';
+import { AddGroupRequest, GroupSchema, transformToGroupsSchema, UpdateGroupRequest } from '../schema';
 import { assert, JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
+import moment from "moment";
 
 @injectable()
 export class PostGroupService {
@@ -31,7 +32,7 @@ export class PostGroupService {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
-        const { name, firstGroupNewName, groupViewType } = payload;
+        const { name, firstGroupNewName, viewType } = payload;
 
         const groups = await this.postGroupRepository.find({ userId: jwtPayload.id });
 
@@ -52,7 +53,7 @@ export class PostGroupService {
                     : null,
                 this.postGroupRepository.save({
                     name,
-                    viewType: groupViewType,
+                    viewType,
                     userId: jwtPayload.id,
                     orderNumber: groups.length + 1
                 })
@@ -76,11 +77,94 @@ export class PostGroupService {
 
         const newGroup = await this.postGroupRepository.save({
             name,
-            viewType: groupViewType,
+            viewType,
             orderNumber: groups.length + 1,
             userId: jwtPayload.id
         });
 
         return newGroup.id;
+    }
+
+    public async addGroupPreviewPhoto(jwtPayload: JwtPayload, groupId: number, photo: Express.Multer.File): Promise<void> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        await this.validateUserGroup(jwtPayload.id, groupId);
+
+        const previewUrl = await this.storageService.upload(photo.originalname, photo.mimetype, photo.buffer);
+
+        await this.postGroupRepository.update(groupId, { previewUrl });
+    }
+
+    public async updateGroup(jwtPayload: JwtPayload, groupId: number, params: UpdateGroupRequest): Promise<void> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        await this.validateUserGroup(jwtPayload.id, groupId);
+
+        await this.postGroupRepository.update(groupId, this.postGroupRepository.create(params));
+    }
+
+    public async deleteGroup(jwtPayload: JwtPayload, groupId: number): Promise<void> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        await this.validateUserGroup(jwtPayload.id, groupId);
+
+        await this.postGroupRepository.update(groupId, { deletedAt: moment.utc() });
+    }
+
+    public async get(jwtPayload: JwtPayload): Promise<GroupSchema[]> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        const groups = await this.postGroupRepository.find({
+            where: { userId: jwtPayload.id, deletedAt: IsNull() },
+            order: { orderNumber: 'ASC' }
+        });
+
+        return groups.map((group) => transformToGroupsSchema(group));
+    }
+
+    private async validateUserGroup(userId: number, groupId: number): Promise<PostGroup> {
+        const group = await this.postGroupRepository.findOne({ id: groupId, deletedAt: IsNull() });
+
+        if (!group) {
+            throw ErrorMessages.PostGroupDoesntExist;
+        }
+
+        if (group.userId !== userId) {
+            throw ErrorMessages.UserDoesntOwnThisPostGroup;
+        }
+
+        return group;
     }
 }

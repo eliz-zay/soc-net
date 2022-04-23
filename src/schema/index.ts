@@ -9,12 +9,15 @@ export * from './PersonalInfoRequest';
 export * from './PreferencesRequest';
 export * from './UserInfoPatchRequest';
 export * from './AddGroupRequest';
+export * from './UpdateGroupRequest';
 
 export * from './UserSchema';
 export * from './ErrorSchema';
+export * from './GroupSchema';
 
 export * from './LoggedInUserResponse';
 export * from './UserResponse';
 export * from './SuccessResponse';
 export * from './UserInfoResponse';
 export * from './CreatedEntityResponse';
+export * from './GroupsResponse';

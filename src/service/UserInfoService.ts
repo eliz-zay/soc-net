@@ -92,7 +92,7 @@ export class UserInfoService {
         );
     }
 
-    async addProfilePhoto(jwtPayload: JwtPayload, photo: Express.Multer.File) {
+    async addProfilePhoto(jwtPayload: JwtPayload, photo: Express.Multer.File): Promise<void> {
         if (!jwtPayload) {
             throw ErrorMessages.AuthorizationRequired;
         }

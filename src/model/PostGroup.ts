@@ -39,7 +39,7 @@ export class PostGroup {
     @Column({ name: 'preview_url', type: 'varchar', length: '256', nullable: true })
     previewUrl?: string;
 
-    @Column({ name: 'order_number', type: 'int', nullable: true })
+    @Column({ name: 'order_number', type: 'int', nullable: false })
     orderNumber: number;
 
     @Column({ name: 'view_type', type: 'enum', enum: EGroupViewType, nullable: false })

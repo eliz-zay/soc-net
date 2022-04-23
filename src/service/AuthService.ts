@@ -33,11 +33,14 @@ export class AuthService {
     }
 
     public async signUp(signUpRequest: SignUpRequest): Promise<LoggedInUserSchema> {
-        const { email, password } = signUpRequest;
+        const { email, username, password } = signUpRequest;
 
-        const usersByEmail = await this.userRepository.find({ email });
-        if (usersByEmail.length !== 0) {
+        const existingUser = await this.userRepository.findOne({ where: [{ email }, { username }] });
+        if (existingUser?.email === email) {
             throw ErrorMessages.UserWithGivenEmailExists;
+        }
+        if (existingUser?.username === username) {
+            throw ErrorMessages.UserWithGivenUsernameExists;
         }
 
         const hashedData: HashedData = await hashString(password);
