@@ -10,6 +10,7 @@ export * from './PreferencesRequest';
 export * from './UserInfoPatchRequest';
 export * from './AddGroupRequest';
 export * from './UpdateGroupRequest';
+export * from './AddPostRequest';
 
 export * from './UserSchema';
 export * from './ErrorSchema';

@@ -11,6 +11,8 @@ import {
 
 import { User, DealTemplate, Post } from './';
 
+import { EFileType } from '../core';
+
 export enum EDealState {
     Proposal = 'Proposal',
     Declined = 'Declined',
@@ -25,13 +27,8 @@ export enum EDealMessageSender {
     Blogger = 'Blogger'
 }
 
-export enum EDealAttachmentType {
-    Photo = 'Photo',
-    Video = 'Video'
-}
-
 export interface DealAttachment {
-    type: EDealAttachmentType;
+    type: EFileType;
     url: string;
 }
 

@@ -143,5 +143,20 @@ export const ErrorMessages = Object.freeze({
         title: 'У вас нет группы постов с таким ID',
         message: 'У вас нет группы постов с таким ID',
         code: 28
+    }),
+    DealDoesntExist: new ErrorSchema({
+        title: 'У вас нет сделки с таким ID',
+        message: 'У вас нет сделки с таким ID',
+        code: 29
+    }),
+    PostDoesntExist: new ErrorSchema({
+        title: 'У вас нет поста с таким ID',
+        message: 'У вас нет поста с таким ID',
+        code: 30
+    }),
+    YouAlreadyUploadedMediaToPost: new ErrorSchema({
+        title: 'Вы уже добавили медиа к этому посту',
+        message: 'Вы уже добавили медиа к этому посту',
+        code: 31
     })
 });
