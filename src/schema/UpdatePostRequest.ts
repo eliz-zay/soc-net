@@ -4,11 +4,12 @@ import { ArrayMaxSize, IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } fro
 import { ETag } from '../model';
 
 @ApiModel()
-export class AddPostRequest {
+export class UpdatePostRequest {
+    @IsOptional()
     @MaxLength(10000)
     @IsString()
     @ApiModelProperty({ required: false })
-    content: string;
+    content?: string;
 
     @IsOptional()
     @IsInt()
@@ -17,13 +18,8 @@ export class AddPostRequest {
     groupId?: number;
 
     @IsOptional()
-    @IsInt()
-    @Min(1)
-    @ApiModelProperty({ required: false })
-    dealId?: number;
-
     @IsEnum(ETag, { each: true })
     @ArrayMaxSize(3)
     @ApiModelProperty({ required: true, type: 'array', itemType: 'string', enum: Object.values(ETag).filter((value) => typeof value === 'string') })
-    tags: ETag[];
+    tags?: ETag[];
 }

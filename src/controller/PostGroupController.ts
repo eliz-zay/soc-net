@@ -20,11 +20,11 @@ export class PostGroupController implements interfaces.Controller {
     constructor(@inject("PostGroupService") private postGroupService: PostGroupService) { }
 
     @ApiOperationPost({
-        path: '/groups',
+        path: '/post-groups',
         parameters: { body: { required: true, model: "AddGroupRequest" } },
         responses: { 200: { model: "CreatedEntityResponse" } }
     })
-    @httpPost('/groups', makeValidateBody(AddGroupRequest))
+    @httpPost('/post-groups', makeValidateBody(AddGroupRequest))
     private async addGroup(
         @request() req: express.Request & { user: JwtPayload },
         @requestBody() body: AddGroupRequest
@@ -35,7 +35,7 @@ export class PostGroupController implements interfaces.Controller {
     }
 
     @ApiOperationPatch({
-        path: '/groups/{id}/preview-photo',
+        path: '/post-groups/{id}/preview-photo',
         consumes: ['multipart/form-data'],
         parameters: {
             path: {
@@ -52,7 +52,7 @@ export class PostGroupController implements interfaces.Controller {
         },
         responses: { 200: { model: "SuccessResponse" } }
     })
-    @httpPatch('/groups/:id/preview-photo', multer().single('photo'))
+    @httpPatch('/post-groups/:id/preview-photo', multer().single('photo'))
     private async addGroupPreviewPhoto(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponse> {
         const file = req.file;
         const id = req.params.id;
@@ -71,7 +71,7 @@ export class PostGroupController implements interfaces.Controller {
     }
 
     @ApiOperationPatch({
-        path: '/groups/{id}',
+        path: '/post-groups/{id}',
         parameters: {
             path: {
                 id: {
@@ -85,7 +85,7 @@ export class PostGroupController implements interfaces.Controller {
         },
         responses: { 200: { model: "SuccessResponse" } }
     })
-    @httpPatch('/groups/:id', makeValidateBody(UpdateGroupRequest))
+    @httpPatch('/post-groups/:id', makeValidateBody(UpdateGroupRequest))
     private async updateGroup(
         @request() req: express.Request & { user: JwtPayload },
         @requestBody() body: UpdateGroupRequest
@@ -102,7 +102,7 @@ export class PostGroupController implements interfaces.Controller {
     }
 
     @ApiOperationDelete({
-        path: '/groups/{id}',
+        path: '/post-groups/{id}',
         parameters: {
             path: {
                 id: {
@@ -115,7 +115,7 @@ export class PostGroupController implements interfaces.Controller {
         },
         responses: { 200: { model: "SuccessResponse" } }
     })
-    @httpDelete('/groups/:id')
+    @httpDelete('/post-groups/:id')
     private async deleteGroup(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponse> {
         const id = req.params.id;
 
@@ -129,11 +129,11 @@ export class PostGroupController implements interfaces.Controller {
     }
 
     @ApiOperationGet({
-        path: '/groups',
+        path: '/post-groups',
         parameters: {},
         responses: { 200: { model: "GroupsResponse" } }
     })
-    @httpGet('/groups')
+    @httpGet('/post-groups')
     private async getGroups(@request() req: express.Request & { user: JwtPayload }): Promise<GroupsResponse> {
         const groups = await this.postGroupService.get(req.user);
 

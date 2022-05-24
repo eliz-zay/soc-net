@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
 
-import { EGeoRange, EProfileFillingStage, Geo, KDefaultPostGroupName, PostGroup, User } from '../model';
+import { EGeoRange, EProfileFillingStage, Geo, User } from '../model';
 import { PersonalInfoRequest, UserInfoPatchRequest, PreferencesRequest, UserInfoSchema, transformToUserInfoSchema } from '../schema';
 import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
@@ -11,7 +11,6 @@ import { LoggerService, StorageService } from '.';
 export class UserInfoService {
     private userRepository: Repository<User>;
     private geoRepository: Repository<Geo>;
-    private postGroupRepository: Repository<PostGroup>;
 
     constructor(
         @inject('LoggerService') private logger: LoggerService,
@@ -19,7 +18,6 @@ export class UserInfoService {
     ) {
         this.userRepository = getRepository(User);
         this.geoRepository = getRepository(Geo);
-        this.postGroupRepository = getRepository(PostGroup);
     }
 
     public async addPersonalInfo(jwtPayload: JwtPayload, payload: PersonalInfoRequest): Promise<void> {
@@ -125,24 +123,16 @@ export class UserInfoService {
 
         const { visibleForAdProposal, businessDescription, occupation, hobbies, profileViewType } = payload;
 
-        await Promise.all([
-            this.userRepository.update(
-                user.id,
-                {
-                    visibleForAdProposal,
-                    businessDescription,
-                    occupation,
-                    hobbies,
-                    profileFillingStage: EProfileFillingStage.Filled
-                }
-            ),
-            this.postGroupRepository.insert({
-                name: KDefaultPostGroupName,
-                orderNumber: 1,
-                viewType: profileViewType,
-                user: { id: jwtPayload.id }
-            })
-        ]);
+        await this.userRepository.update(
+            user.id,
+            {
+                visibleForAdProposal,
+                businessDescription,
+                occupation,
+                hobbies,
+                profileFillingStage: EProfileFillingStage.Filled
+            }
+        );
     }
 
     async update(jwtPayload: JwtPayload, payload: UserInfoPatchRequest) {

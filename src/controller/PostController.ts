@@ -5,7 +5,7 @@ import { interfaces, controller, httpPost, requestBody, request, httpGet, httpPa
 import { inject } from 'inversify';
 
 import { PostService } from '../service';
-import { AddPostRequest, CreatedEntityResponse, SuccessResponse } from '../schema';
+import { AddPostRequest, CreatedEntityResponse, SuccessResponse, UpdatePostRequest } from '../schema';
 import { JwtPayload, makeValidateBody } from '../core';
 import { checkIfUserActivated } from './middlewares';
 import { ErrorMessages } from '../messages';
@@ -66,6 +66,27 @@ export class PostController implements interfaces.Controller {
         }
 
         await this.postService.addMediaToPhoto(req.user, Number(id), Object.values(files));
+
+        return { success: true };
+    }
+
+    @ApiOperationPatch({
+        path: '/posts/{id}',
+        parameters: { body: { required: true, model: "UpdatePostRequest" } },
+        responses: { 200: { model: "SuccessResponse" } }
+    })
+    @httpPatch('/posts/:id', makeValidateBody(UpdatePostRequest))
+    private async updatePost(
+        @request() req: express.Request & { user: JwtPayload },
+        @requestBody() body: UpdatePostRequest
+    ): Promise<SuccessResponse> {
+        const id = req.params.id;
+
+        if (!Number(id) || Number(id) <= 0) {
+            throw (ErrorMessages.ValidationFailed);
+        }
+
+        await this.postService.updatePost(req.user, Number(id), body);
 
         return { success: true };
     }

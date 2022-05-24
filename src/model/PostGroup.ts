@@ -18,7 +18,6 @@ export enum EGroupViewType {
     TextBlog = 'TextBlog'
 }
 
-export const KDefaultPostGroupName = 'Группа 1';
 export const KMaxGroupsPerUser = 6;
 
 @Entity()

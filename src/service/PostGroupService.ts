@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
 import { getRepository, IsNull, Repository } from "typeorm";
 
-import { KDefaultPostGroupName, KMaxGroupsPerUser, PostGroup, User } from '../model';
+import { KMaxGroupsPerUser, PostGroup, User } from '../model';
 import { AddGroupRequest, GroupSchema, transformToGroupsSchema, UpdateGroupRequest } from '../schema';
-import { assert, JwtPayload } from '../core';
+import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
 import moment from "moment";
@@ -32,40 +32,9 @@ export class PostGroupService {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
-        const { name, firstGroupNewName, viewType } = payload;
+        const { name, viewType } = payload;
 
         const groups = await this.postGroupRepository.find({ userId: jwtPayload.id });
-
-        assert(groups.length !== 0, 'Groups can\'t be empty for any user');
-
-        /**
-         * Case when there was one default group
-         * Checking name colissions, renaming first group and inserting second
-         */
-        if (groups.length === 1) {
-            if (name === firstGroupNewName) {
-                throw ErrorMessages.GroupNamesCantBeEqual;
-            }
-
-            const result = await Promise.all([
-                firstGroupNewName !== KDefaultPostGroupName
-                    ? this.postGroupRepository.update(groups[0].id, { name: firstGroupNewName })
-                    : null,
-                this.postGroupRepository.save({
-                    name,
-                    viewType,
-                    userId: jwtPayload.id,
-                    orderNumber: groups.length + 1
-                })
-            ]);
-
-            return result[1].id;
-        }
-
-        /**
-         * Case when where were multiple groups
-         * Checking name collisions with previous groups, checking max groupd ans inserting
-         */
 
         if (groups.length === KMaxGroupsPerUser) {
             throw ErrorMessages.MaxGroupsCountReached;

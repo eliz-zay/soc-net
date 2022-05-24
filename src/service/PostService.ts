@@ -2,11 +2,10 @@ import { inject, injectable } from "inversify";
 import { getRepository, IsNull, Repository } from "typeorm";
 
 import { Deal, MediaUrl, Post, PostGroup, User } from '../model';
-import { AddPostRequest } from '../schema';
-import { assert, EFileType, getFileType, JwtPayload } from '../core';
+import { AddPostRequest, UpdatePostRequest } from '../schema';
+import { getFileType, JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
-import moment from "moment";
 
 @injectable()
 export class PostService {
@@ -36,14 +35,14 @@ export class PostService {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
-        const { content, groupId, dealId } = payload;
+        const { content, groupId, dealId, tags } = payload;
 
         const [group, deal] = await Promise.all([
             this.postGroupRepository.findOne({ id: groupId, deletedAt: IsNull() }),
             dealId ? this.dealRepository.findOne({ id: dealId, deletedAt: IsNull() }) : null
         ]);
 
-        if (!group) {
+        if (groupId && !group) {
             throw ErrorMessages.PostGroupDoesntExist;
         }
 
@@ -53,12 +52,16 @@ export class PostService {
 
         const post: Post = new Post({
             content,
-            postGroupId: groupId,
-            userId: jwtPayload.id
+            userId: jwtPayload.id,
+            tags
         });
 
         if (dealId) {
             post.dealId = dealId;
+        }
+
+        if (groupId) {
+            post.postGroupId = groupId;
         }
 
         const createdPost = await this.postRepository.save(post);
@@ -95,5 +98,39 @@ export class PostService {
         })));
 
         await this.postRepository.update(postId, { mediaUrls });
+    }
+
+    public async updatePost(jwtPayload: JwtPayload, postId: number, payload: UpdatePostRequest): Promise<void> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        const post = await this.postRepository.findOne(postId);
+
+        if (!post) {
+            throw ErrorMessages.PostDoesntExist;
+        }
+
+        const updateBody: Partial<Post> = {};
+
+        const { content, groupId, tags } = payload;
+
+        if (content) {
+            updateBody.content = content;
+        }
+        if (groupId) {
+            updateBody.postGroupId = groupId;
+        }
+        if (tags) {
+            updateBody.tags = tags;
+        }
+
+        await this.postRepository.update(postId, updateBody);
     }
 }

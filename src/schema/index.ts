@@ -11,6 +11,8 @@ export * from './UserInfoPatchRequest';
 export * from './AddGroupRequest';
 export * from './UpdateGroupRequest';
 export * from './AddPostRequest';
+export * from './UpdatePostRequest';
+
 
 export * from './UserSchema';
 export * from './ErrorSchema';
