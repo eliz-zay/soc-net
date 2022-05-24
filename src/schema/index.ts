@@ -12,11 +12,15 @@ export * from './AddGroupRequest';
 export * from './UpdateGroupRequest';
 export * from './AddPostRequest';
 export * from './UpdatePostRequest';
+export * from './PostCommentRequest';
+export * from './UpdateBasicDescriptionRequest';
 
-
+export * from './PostSchema';
 export * from './UserSchema';
 export * from './ErrorSchema';
 export * from './GroupSchema';
+export * from './PostCommentSchema';
+export * from './ProfileSummarySchema';
 
 export * from './LoggedInUserResponse';
 export * from './UserResponse';
@@ -24,3 +28,4 @@ export * from './SuccessResponse';
 export * from './UserInfoResponse';
 export * from './CreatedEntityResponse';
 export * from './GroupsResponse';
+export * from './PostDetailsResponse';

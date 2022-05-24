@@ -1,11 +1,12 @@
 import { inject, injectable } from "inversify";
-import { getRepository, IsNull, Repository } from "typeorm";
+import { getRepository, In, IsNull, Repository } from "typeorm";
 
 import { Deal, MediaUrl, Post, PostGroup, User } from '../model';
-import { AddPostRequest, UpdatePostRequest } from '../schema';
+import { AddPostRequest, PostCommentRequest, PostDetailsDataSchema, transformToPostDetailsDataSchema, UpdatePostRequest } from '../schema';
 import { getFileType, JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
+import moment from "moment";
 
 @injectable()
 export class PostService {
@@ -71,7 +72,7 @@ export class PostService {
         return createdPost.id;
     }
 
-    public async addMediaToPhoto(jwtPayload: JwtPayload, postId: number, files: Express.Multer.File[]): Promise<void> {
+    public async addMediaToPost(jwtPayload: JwtPayload, postId: number, files: Express.Multer.File[]): Promise<void> {
         if (!jwtPayload) {
             throw ErrorMessages.AuthorizationRequired;
         }
@@ -82,7 +83,7 @@ export class PostService {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
-        const post = await this.postRepository.findOne(postId);
+        const post = await this.postRepository.findOne({ where: { id: postId, deletedAt: IsNull() } });
 
         if (!post) {
             throw ErrorMessages.PostDoesntExist;
@@ -111,7 +112,7 @@ export class PostService {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
-        const post = await this.postRepository.findOne(postId);
+        const post = await this.postRepository.findOne({ where: { id: postId, deletedAt: IsNull() } });
 
         if (!post) {
             throw ErrorMessages.PostDoesntExist;
@@ -132,5 +133,92 @@ export class PostService {
         }
 
         await this.postRepository.update(postId, updateBody);
+    }
+
+    public async likePost(jwtPayload: JwtPayload, postId: number) {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        const post = await this.postRepository.findOne({ where: { id: postId, deletedAt: IsNull() }, relations: ['likes'] });
+
+        if (!post) {
+            throw ErrorMessages.PostDoesntExist;
+        }
+
+        const isLiked = post.likes.find((likedUser) => likedUser.id === jwtPayload.id) !== undefined;
+
+        if (isLiked) {
+            post.likesCount = post.likesCount - 1;
+            post.likes = post.likes.filter((likedUser) => likedUser.id !== jwtPayload.id);
+        }
+
+        if (!isLiked) {
+            post.likesCount = post.likesCount + 1;
+            post.likes.push(user);
+        }
+
+        await this.postRepository.save(post);
+    }
+
+    public async commentPost(jwtPayload: JwtPayload, postId: number, payload: PostCommentRequest) {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        const post = await this.postRepository.findOne({ where: { id: postId, deletedAt: IsNull() } });
+
+        if (!post) {
+            throw ErrorMessages.PostDoesntExist;
+        }
+
+        const comments = Array.from(post.comments);
+        comments.push({ userId: jwtPayload.id, content: payload.content });
+
+        await this.postRepository.update(postId, { comments });
+    }
+
+    public async deletePost(jwtPayload: JwtPayload, postId: number) {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        const post = await this.postRepository.findOne({ where: { id: postId, deletedAt: IsNull() } });
+
+        if (!post) {
+            throw ErrorMessages.PostDoesntExist;
+        }
+
+        await this.postRepository.update(postId, { deletedAt: moment() });
+    }
+
+    public async getPostDetails(postId: number): Promise<PostDetailsDataSchema> {
+        const post = await this.postRepository.findOne({ where: { id: postId, deletedAt: IsNull() }, relations: ['user', 'likes', 'postGroup'] });
+
+        if (!post) {
+            throw ErrorMessages.PostDoesntExist;
+        }
+
+        const commentUsers = await this.userRepository.find({ where: { id: In(post.comments.map((comment) => comment.userId)) } });
+
+        return transformToPostDetailsDataSchema(post, commentUsers);
     }
 }

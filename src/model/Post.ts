@@ -65,6 +65,9 @@ export class Post {
     @ManyToMany(() => User, (user) => user.likedPosts)
     likes: User[];
 
+    @Column({ name: 'likes_count', type: 'int', nullable: false, default: 0 })
+    likesCount: number;
+
     @Column({ name: 'tags', type: 'varchar', length: 50, array: true, nullable: false, default: [] })
     tags: ETag[];
 

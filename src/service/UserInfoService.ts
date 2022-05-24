@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
 
 import { EGeoRange, EProfileFillingStage, Geo, User } from '../model';
-import { PersonalInfoRequest, UserInfoPatchRequest, PreferencesRequest, UserInfoSchema, transformToUserInfoSchema } from '../schema';
+import { PersonalInfoRequest, UserInfoPatchRequest, PreferencesRequest, UserInfoSchema, transformToUserInfoSchema, UpdateBasicDescriptionRequest } from '../schema';
 import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
@@ -171,5 +171,19 @@ export class UserInfoService {
         }
 
         return transformToUserInfoSchema(user);
+    }
+
+    async updateBasicDescription(jwtPayload: JwtPayload, payload: UpdateBasicDescriptionRequest): Promise<void> {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        await this.userRepository.update(jwtPayload.id, { basicDescription: payload.basicDescription });
     }
 }
