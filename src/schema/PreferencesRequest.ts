@@ -1,7 +1,7 @@
 import { ApiModel, ApiModelProperty } from 'swagger-express-ts';
 
 import { ArrayMaxSize, ArrayMinSize, IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
-import { EGroupViewType, EHobby, EOccupation } from '../model';
+import { EGroupViewType, ETag, EOccupation } from '../model';
 
 @ApiModel()
 export class PreferencesRequest {
@@ -18,11 +18,11 @@ export class PreferencesRequest {
     @ApiModelProperty({ required: true, enum: Object.values(EOccupation).filter((value) => typeof value === 'string') })
     occupation: EOccupation;
 
-    @IsEnum(EHobby, { each: true })
+    @IsEnum(ETag, { each: true })
     @ArrayMaxSize(3)
     @ArrayMinSize(3)
-    @ApiModelProperty({ required: true, type: 'array', itemType: 'string', enum: Object.values(EHobby).filter((value) => typeof value === 'string') })
-    hobbies: EHobby[];
+    @ApiModelProperty({ required: true, type: 'array', itemType: 'string', enum: Object.values(ETag).filter((value) => typeof value === 'string') })
+    hobbies: ETag[];
 
     @IsEnum(EGroupViewType)
     @ApiModelProperty({ required: true, enum: Object.values(EGroupViewType).filter((value) => typeof value === 'string') })

@@ -16,6 +16,7 @@ import { Post } from './Post';
 import { PostGroup } from './PostGroup';
 import { Notification } from './Notification';
 import { DealTemplate } from "./DealTemplate";
+import { ETag } from "./ETag";
 
 export class OtpCode {
     code: number;
@@ -41,16 +42,6 @@ export enum EOccupation {
     Blogger = 'Blogger',
     Businessman = 'Businessman',
     Company = 'Company'
-}
-
-export enum EHobby {
-    IT = 'IT',
-    Cooking = 'Cooking',
-    Travelling = 'Travelling',
-    Architecture = 'Architecture',
-    Art = 'Art',
-    Music = 'Music',
-    Business = 'Business'
 }
 
 @Entity()
@@ -122,7 +113,7 @@ export class User {
     occupation: EOccupation;
 
     @Column({ type: 'varchar', length: 50, array: true, nullable: true })
-    hobbies: EHobby[];
+    hobbies: ETag[];
 
     @Column({ name: 'visible_for_ad_proposal', type: 'boolean', nullable: false, default: true })
     visibleForAdProposal: boolean;

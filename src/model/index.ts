@@ -11,3 +11,4 @@ export * from './NotificationType';
 export * from './MobileToken';
 export * from './MailType';
 export * from './Deal';
+export * from './ETag';

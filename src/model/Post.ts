@@ -7,6 +7,7 @@ import {
     JoinColumn,
     ManyToOne,
     ManyToMany,
+    OneToOne,
 } from 'typeorm';
 
 import { User } from './User';
@@ -14,6 +15,7 @@ import { PostGroup } from './PostGroup';
 import { Deal } from './Deal';
 
 import { EFileType } from '../core';
+import { ETag } from './ETag';
 
 export class MediaUrl {
     type: EFileType;
@@ -46,22 +48,25 @@ export class Post {
     @Column({ name: 'comments', type: 'json', nullable: false, default: [] })
     comments: Comment[];
 
-    @ManyToOne(() => Deal, (deal) => deal.posts)
+    @OneToOne(() => Deal, (deal) => deal.post)
     @JoinColumn({ name: 'deal_id' })
     deal?: Deal;
 
     @Column({ name: 'deal_id', type: 'int', nullable: true })
     dealId?: number;
 
-    @ManyToOne(() => PostGroup, (group) => group.posts, { nullable: false })
+    @ManyToOne(() => PostGroup, (group) => group.posts, { nullable: true })
     @JoinColumn({ name: 'post_group_id' })
-    postGroup: PostGroup;
+    postGroup?: PostGroup;
 
-    @Column({ name: 'post_group_id', type: 'int', nullable: false })
-    postGroupId: number;
+    @Column({ name: 'post_group_id', type: 'int', nullable: true })
+    postGroupId?: number;
 
     @ManyToMany(() => User, (user) => user.likedPosts)
     likes: User[];
+
+    @Column({ name: 'tags', type: 'varchar', length: 50, array: true, nullable: false, default: [] })
+    tags: ETag[];
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;

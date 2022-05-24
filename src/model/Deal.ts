@@ -7,6 +7,7 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
+    OneToOne,
 } from 'typeorm';
 
 import { User, DealTemplate, Post } from './';
@@ -65,8 +66,8 @@ export class Deal {
     @Column({ type: 'json', array: true, nullable: false, default: [] })
     chat: DealMessage[];
 
-    @OneToMany(() => Post, (post) => post.deal)
-    posts: Post[];
+    @OneToOne(() => Post, (post) => post.deal)
+    post: Post;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;

@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { ApiModel, ApiModelProperty, SwaggerDefinitionConstant } from 'swagger-express-ts';
-import { EHobby, EOccupation, EUserGender, User } from '../model';
+import { ETag, EOccupation, EUserGender, User } from '../model';
 
 @ApiModel()
 export class UserInfoSchema {
@@ -28,8 +28,8 @@ export class UserInfoSchema {
     @ApiModelProperty({ required: true, enum: Object.values(EOccupation).filter((value) => typeof value === 'string') })
     occupation: EOccupation;
 
-    @ApiModelProperty({ required: true, type: 'array', itemType: 'string', enum: Object.values(EHobby).filter((value) => typeof value === 'string') })
-    hobbies: EHobby[];
+    @ApiModelProperty({ required: true, type: 'array', itemType: 'string', enum: Object.values(ETag).filter((value) => typeof value === 'string') })
+    hobbies: ETag[];
 }
 
 @ApiModel()
