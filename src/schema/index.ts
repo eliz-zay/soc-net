@@ -29,3 +29,4 @@ export * from './UserInfoResponse';
 export * from './CreatedEntityResponse';
 export * from './GroupsResponse';
 export * from './PostDetailsResponse';
+export * from './ProfileResponse';
