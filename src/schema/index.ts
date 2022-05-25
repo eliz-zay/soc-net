@@ -12,7 +12,7 @@ export * from './AddGroupRequest';
 export * from './UpdateGroupRequest';
 export * from './AddPostRequest';
 export * from './UpdatePostRequest';
-
+export * from './PaginationRequest';
 
 export * from './UserSchema';
 export * from './ErrorSchema';
@@ -24,3 +24,4 @@ export * from './SuccessResponse';
 export * from './UserInfoResponse';
 export * from './CreatedEntityResponse';
 export * from './GroupsResponse';
+export * from './NotificationResponse';

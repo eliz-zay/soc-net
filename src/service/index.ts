@@ -5,3 +5,4 @@ export * from './UserInfoService';
 export * from './StorageService';
 export * from './PostGroupService';
 export * from './PostService';
+export * from './NotificationService';

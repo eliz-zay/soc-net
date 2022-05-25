@@ -6,7 +6,7 @@ import { EGroupViewType, } from '../model';
 @ApiModel()
 export class AddGroupRequest {
     @IsString()
-    @ApiModelProperty({ required: false })
+    @ApiModelProperty({ required: true })
     name: string;
 
     @IsEnum(EGroupViewType)

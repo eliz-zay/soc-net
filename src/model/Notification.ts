@@ -7,7 +7,7 @@ import {
     JoinColumn,
     ManyToOne,
 } from 'typeorm';
-import { NotificationType } from './NotificationType';
+import { NotificationType, ENotificationType } from './NotificationType';
 
 import { User } from './User';
 
@@ -19,6 +19,9 @@ export class Notification {
     @ManyToOne(() => User, (user) => user.notifications, { nullable: false })
     @JoinColumn({ name: 'user_id' })
     user: User;
+
+    @Column({ name: 'user_id', type: 'int', nullable: false })
+    userId: number;
 
     @Column({ type: 'varchar', length: 100, nullable: false })
     title: string;
@@ -32,6 +35,9 @@ export class Notification {
     @ManyToOne(() => NotificationType, { nullable: false })
     @JoinColumn({ name: 'notification_code', referencedColumnName: 'code' })
     type: NotificationType;
+
+    @Column({ name: 'notification_code', type: 'varchar', length: 100 })
+    notificationCode: ENotificationType;
 
     @Column({ name: 'read_at', type: 'timestamp', nullable: true })
     readAt?: Date;
