@@ -11,6 +11,10 @@ export function checkIfUserActivated() {
 
         assert(!!authService, 'AuthService from DI container can\'t be null');
 
+        if (!req.user) {
+            return ErrorMessages.AuthorizationRequired;
+        }
+
         try {
             const user = await authService.getUserInfo(req.user);
 
