@@ -1,10 +1,10 @@
 import express from 'express';
-import { ApiOperationGet, ApiPath, SwaggerDefinitionConstant } from 'swagger-express-ts';
+import { ApiOperationGet, ApiOperationPatch, ApiPath, SwaggerDefinitionConstant } from 'swagger-express-ts';
 import { interfaces, controller, request, httpGet, httpPatch } from 'inversify-express-utils';
 import { inject } from 'inversify';
 
 import { NotificationService } from '../service';
-import { MarkReadNotificationsRequest, PaginationRequest, SuccessResponse } from '../schema';
+import { MarkReadNotificationsRequest, NotificationsDataResponse, PaginationRequest, SuccessResponse } from '../schema';
 import { JwtPayload, transformAndValidate } from '../core';
 import { checkIfUserActivated } from './middlewares';
 
@@ -38,13 +38,26 @@ export class NotificationController implements interfaces.Controller {
         responses: { 200: { model: 'NotificationsDataResponse' } }
     })
     @httpGet('/')
-    private async getNotifications(@request() req: express.Request & { user: JwtPayload }) {
+    private async getNotifications(@request() req: express.Request & { user: JwtPayload }): Promise<NotificationsDataResponse> {
         const paginationRequest: PaginationRequest = await transformAndValidate(PaginationRequest, req.query);
         const notificationsData = await this.notificationService.get(req.user, paginationRequest);
 
         return { success: true, data: notificationsData };
     }
 
+    @ApiOperationPatch({
+        path: '/mark-read',
+        parameters: {
+            query: {
+                ids: {
+                    description: 'Array of notification ids',
+                    required: true,
+                    type: SwaggerDefinitionConstant.Parameter.Type.ARRAY,
+                },
+            }
+        },
+        responses: { 200: { model: 'SuccessResponse' } }
+    })
     @httpPatch('/mark-read')
     private async markRead(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponse> {
         const markReadRequest: MarkReadNotificationsRequest = await transformAndValidate(MarkReadNotificationsRequest, req.query);

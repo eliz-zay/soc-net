@@ -28,6 +28,7 @@ import {
 } from './service';
 
 import { ErrorSchema } from './schema/';
+import { ValidationError } from 'class-validator';
 
 async function bootstrapServer() {
     dotenv.config();
@@ -105,6 +106,8 @@ function setExpressErrorHandler(loggerService: LoggerService) {
         app.use((err: any, req: express.Request, res: express.Response, next: any) => {
             if (err instanceof ErrorSchema) {
                 res.status(err.httpCode).send(err.preview());
+            } else if (err.length && err[0] instanceof ValidationError) {
+                res.status(400).send(ErrorMessages.ValidationFailed.preview());
             } else if (err?.name === 'UnauthorizedError') {
                 res.status(401).send(ErrorMessages.InvalidToken.preview());
             } else {
