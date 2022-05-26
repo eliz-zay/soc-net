@@ -55,7 +55,7 @@ export function transformToProfileDataSchema(
 
     return {
         profile: {
-            name,
+            name: name!,
             username,
             basicDescription,
             photoUrl,
