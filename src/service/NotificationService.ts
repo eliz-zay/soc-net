@@ -1,11 +1,17 @@
 import { inject, injectable } from 'inversify';
-import { getRepository, IsNull, Repository } from 'typeorm';
+import { getRepository, In, IsNull, Repository } from 'typeorm';
+import moment from 'moment';
 
 import { Notification, User } from '../model';
 import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService } from '.';
-import { PaginationRequest, NotificationsDataSchema, transformToNotificationsDataSchema } from '../schema/';
+import {
+    PaginationRequest,
+    NotificationsDataSchema,
+    MarkReadNotificationsRequest,
+    transformToNotificationsDataSchema,
+} from '../schema/';
 
 @injectable()
 export class NotificationService {
@@ -43,5 +49,27 @@ export class NotificationService {
         ]);
 
         return transformToNotificationsDataSchema(notifications, totalNotificationsNumber);
+    }
+
+    public async markRead(jwtPayload: JwtPayload, payload: MarkReadNotificationsRequest) {
+        if (!jwtPayload) {
+            throw ErrorMessages.AuthorizationRequired;
+        }
+
+        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+
+        if (!user) {
+            throw ErrorMessages.UserWithGivenIdDoesntExist;
+        }
+
+        this.notificationRepository.update(
+            {
+                id: In(payload.ids),
+                readAt: IsNull(),
+            },
+            {
+                readAt: moment.utc()
+            }
+        );
     }
 }

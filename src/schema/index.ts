@@ -15,6 +15,7 @@ export * from './UpdatePostRequest';
 export * from './PaginationRequest';
 export * from './PostCommentRequest';
 export * from './UpdateBasicDescriptionRequest';
+export * from './MarkReadNotificationsRequest';
 
 export * from './PostSchema';
 export * from './UserSchema';

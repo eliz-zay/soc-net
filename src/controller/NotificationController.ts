@@ -1,10 +1,10 @@
 import express from 'express';
 import { ApiOperationGet, ApiPath, SwaggerDefinitionConstant } from 'swagger-express-ts';
-import { interfaces, controller, request, httpGet } from 'inversify-express-utils';
+import { interfaces, controller, request, httpGet, httpPatch } from 'inversify-express-utils';
 import { inject } from 'inversify';
 
 import { NotificationService } from '../service';
-import { PaginationRequest } from '../schema';
+import { MarkReadNotificationsRequest, PaginationRequest, SuccessResponse } from '../schema';
 import { JwtPayload, transformAndValidate } from '../core';
 import { checkIfUserActivated } from './middlewares';
 
@@ -43,5 +43,13 @@ export class NotificationController implements interfaces.Controller {
         const notificationsData = await this.notificationService.get(req.user, paginationRequest);
 
         return { success: true, data: notificationsData };
+    }
+
+    @httpPatch('/mark-read')
+    private async markRead(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponse> {
+        const markReadRequest: MarkReadNotificationsRequest = await transformAndValidate(MarkReadNotificationsRequest, req.query);
+        await this.notificationService.markRead(req.user, markReadRequest);
+
+        return { success: true };
     }
 }
