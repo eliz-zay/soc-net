@@ -6,3 +6,4 @@ export * from './StorageService';
 export * from './PostGroupService';
 export * from './PostService';
 export * from './NotificationService';
+export * from './ProfileService';

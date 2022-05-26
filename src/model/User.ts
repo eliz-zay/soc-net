@@ -49,6 +49,9 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ type: 'varchar', length: '50', nullable: true })
+    name: string;
+
     @Column({ type: 'varchar', length: '30', nullable: false })
     username: string;
 
