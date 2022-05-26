@@ -50,7 +50,7 @@ export class User {
     id: number;
 
     @Column({ type: 'varchar', length: '50', nullable: true })
-    name: string;
+    name?: string;
 
     @Column({ type: 'varchar', length: '30', nullable: false })
     username: string;

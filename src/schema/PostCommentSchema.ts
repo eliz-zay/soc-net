@@ -21,7 +21,7 @@ export function transformToPostCommentSchema(comment: Comment, user: User): Post
     const { name, username, photoUrl } = user;
 
     return {
-        name,
+        name: name!,
         username,
         content,
         profilePhotoUrl: photoUrl

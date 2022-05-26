@@ -22,7 +22,7 @@ export function transformToProfileSummarySchema(user: User): ProfileSummarySchem
 
     return {
         id,
-        name,
+        name: name!,
         username,
         profilePhotoUrl: photoUrl
     };
