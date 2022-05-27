@@ -1,12 +1,19 @@
 import { inject, injectable } from "inversify";
 import { getRepository, IsNull, Repository } from "typeorm";
+import moment from "moment";
 
 import { KMaxGroupsPerUser, PostGroup, User } from '../model';
-import { AddGroupRequest, GroupSchema, transformToGroupsSchema, UpdateGroupRequest } from '../schema';
+import {
+    AddGroupRequest,
+    GroupSchema,
+    GroupAndPostsDataSchema,
+    transformToGroupsSchema,
+    UpdateGroupRequest,
+    transformToGroupAndPostsDataSchema
+} from '../schema';
 import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
-import moment from "moment";
 
 @injectable()
 export class PostGroupService {
@@ -104,23 +111,37 @@ export class PostGroupService {
         await this.postGroupRepository.update(groupId, { deletedAt: moment.utc() });
     }
 
-    public async get(jwtPayload: JwtPayload): Promise<GroupSchema[]> {
-        if (!jwtPayload) {
-            throw ErrorMessages.AuthorizationRequired;
-        }
-
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+    public async get(userId: number): Promise<GroupSchema[]> {
+        const user = await this.userRepository.findOne({ id: userId, deletedAt: IsNull() });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
         const groups = await this.postGroupRepository.find({
-            where: { userId: jwtPayload.id, deletedAt: IsNull() },
+            where: { userId, deletedAt: IsNull() },
             order: { orderNumber: 'ASC' }
         });
 
         return groups.map((group) => transformToGroupsSchema(group));
+    }
+
+    public async getGroupAndPosts(jwtPayload: JwtPayload, groupId: number): Promise<GroupAndPostsDataSchema> {
+        // TODO: check access to private groups
+
+        const postGroup = await this.postGroupRepository
+            .createQueryBuilder('postGroup')
+            .leftJoinAndSelect('postGroup.posts', 'post')
+            .where('postGroup.id = :groupId', { groupId })
+            .andWhere('postGroup.deletedAt is null')
+            .andWhere('post.deletedAt is null')
+            .getOne();
+
+        if (!postGroup) {
+            throw ErrorMessages.PostGroupDoesntExist;
+        }
+
+        return transformToGroupAndPostsDataSchema(postGroup);
     }
 
     private async validateUserGroup(userId: number, groupId: number): Promise<PostGroup> {

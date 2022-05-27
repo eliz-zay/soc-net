@@ -37,7 +37,7 @@ export class MediaUrlSchema {
 }
 
 export function transformToPostSchema(post: Post): PostSchema {
-    const { id, content, comments, postGroup, mediaUrls, tags } = post;
+    const { id, content, comments, likesCount, postGroup, mediaUrls, tags } = post;
 
     return {
         id,
@@ -45,7 +45,7 @@ export function transformToPostSchema(post: Post): PostSchema {
         groupName: postGroup?.name,
         mediaUrls,
         tags,
-        likesCount: post.likes.length,
+        likesCount,
         commentsCount: comments.length
     };
 }

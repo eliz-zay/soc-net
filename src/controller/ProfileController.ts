@@ -1,7 +1,7 @@
 import { UpdateBasicDescriptionRequest } from './../schema/UpdateBasicDescriptionRequest';
 import express from 'express';
-import { ApiOperationPatch, ApiPath, SwaggerDefinitionConstant } from 'swagger-express-ts';
-import { interfaces, controller, requestBody, request, httpPatch } from 'inversify-express-utils';
+import { ApiOperationGet, ApiOperationPatch, ApiPath, SwaggerDefinitionConstant } from 'swagger-express-ts';
+import { interfaces, controller, requestBody, request, httpPatch, httpGet } from 'inversify-express-utils';
 import { inject } from 'inversify';
 
 import { UserInfoService, ProfileService } from '../service';
@@ -37,7 +37,7 @@ export class ProfileController implements interfaces.Controller {
         return { success: true };
     }
 
-    @ApiOperationPatch({
+    @ApiOperationGet({
         path: '/{id}',
         parameters: {
             path: {
@@ -51,7 +51,7 @@ export class ProfileController implements interfaces.Controller {
         },
         responses: { 200: { model: "ProfileResponse" } }
     })
-    @httpPatch('/:id')
+    @httpGet('/:id')
     private async getProfile(@request() req: express.Request & { user: JwtPayload }): Promise<ProfileResponse> {
         const id = req.params.id;
 

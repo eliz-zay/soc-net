@@ -33,3 +33,4 @@ export * from './GroupsResponse';
 export * from './NotificationResponse';
 export * from './PostDetailsResponse';
 export * from './ProfileResponse';
+export * from './GroupAndPostsResponse';

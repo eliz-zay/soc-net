@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { getRepository, Repository } from "typeorm";
+import { getRepository, IsNull, Repository } from "typeorm";
 
 import config from '../../config.json';
 
@@ -26,11 +26,12 @@ export class ProfileService {
                 .loadRelationCountAndMap('user.followeesCount', 'user.followees')
                 .loadRelationCountAndMap('user.followersCount', 'user.followers')
                 .where('user.id = :id', { id })
+                .andWhere('user.deletedAt is null')
                 .getOne(),
-            this.postGroupRepository.find({ userId: id }),
+            this.postGroupRepository.find({ userId: id, deletedAt: IsNull() }),
             this.postRepository.createQueryBuilder('post')
-                .loadRelationCountAndMap('post.likesCount', 'post.likes')
                 .where('post.userId = :id', { id })
+                .andWhere('post.deletedAt is null')
                 .skip(0)
                 .take(config.postsPerProfile)
                 .getMany()

@@ -5,7 +5,7 @@ import { interfaces, controller, httpPost, requestBody, request, httpGet, httpPa
 import { inject } from 'inversify';
 
 import { PostGroupService } from '../service';
-import { AddGroupRequest, CreatedEntityResponse, GroupsResponse, SuccessResponse, UpdateGroupRequest } from '../schema';
+import { AddGroupRequest, CreatedEntityResponse, GroupAndPostsResponse, GroupsResponse, SuccessResponse, UpdateGroupRequest } from '../schema';
 import { JwtPayload, makeValidateBody } from '../core';
 import { checkIfUserActivated } from './middlewares';
 import { ErrorMessages } from '../messages';
@@ -129,14 +129,56 @@ export class PostGroupController implements interfaces.Controller {
     }
 
     @ApiOperationGet({
-        path: '/post-groups',
-        parameters: {},
+        path: '/{id}/post-groups',
+        parameters: {
+            path: {
+                id: {
+                    description: 'Profile id',
+                    required: true,
+                    type: SwaggerDefinitionConstant.Parameter.Type.INTEGER,
+                    minimum: 1
+                }
+            }
+        },
         responses: { 200: { model: "GroupsResponse" } }
     })
-    @httpGet('/post-groups')
-    private async getGroups(@request() req: express.Request & { user: JwtPayload }): Promise<GroupsResponse> {
-        const groups = await this.postGroupService.get(req.user);
+    @httpGet('/:id/post-groups')
+    private async getGroups(@request() req: express.Request): Promise<GroupsResponse> {
+        const id = req.params.id;
+
+        if (!Number(id) || Number(id) <= 0) {
+            throw (ErrorMessages.ValidationFailed);
+        }
+
+        const groups = await this.postGroupService.get(Number(id));
 
         return { success: true, data: { groups } };
+    }
+
+    @ApiOperationGet({
+        path: '/post-groups/{id}/posts',
+        parameters: {
+            path: {
+                id: {
+                    description: 'Group id',
+                    required: true,
+                    type: SwaggerDefinitionConstant.Parameter.Type.INTEGER,
+                    minimum: 1
+                }
+            }
+        },
+        responses: { 200: { model: 'GroupAndPostsResponse' } }
+    })
+    @httpGet('/post-groups/:id/posts')
+    private async getGroupAndPosts(@request() req: express.Request & { user: JwtPayload }): Promise<GroupAndPostsResponse> {
+        const id = req.params.id;
+
+        if (!Number(id) || Number(id) <= 0) {
+            throw (ErrorMessages.ValidationFailed);
+        }
+
+        const groupAndPosts = await this.postGroupService.getGroupAndPosts(req.user, Number(id));
+
+        return { success: true, data: groupAndPosts };
     }
 }
