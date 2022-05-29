@@ -163,5 +163,15 @@ export const ErrorMessages = Object.freeze({
         title: 'Вы не можете подписаться сами на себя',
         message: 'Вы не можете подписаться сами на себя',
         code: 32
+    }),
+    CountryWithGivenIdDoesntExist: new ErrorSchema({
+        title: `Страны с таким ID не существует`,
+        message: `Страны с таким ID не существует`,
+        code: 33
+    }),
+    RegionWithGivenIdDoesntExist: new ErrorSchema({
+        title: `Региона с таким ID не существует`,
+        message: `Региона с таким ID не существует`,
+        code: 34
     })
 });

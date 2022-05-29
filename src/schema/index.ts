@@ -34,3 +34,4 @@ export * from './NotificationResponse';
 export * from './PostDetailsResponse';
 export * from './ProfileResponse';
 export * from './GroupAndPostsResponse';
+export * from './GeoResponseSchema';

@@ -7,3 +7,4 @@ export * from './PostGroupService';
 export * from './PostService';
 export * from './NotificationService';
 export * from './ProfileService';
+export * from './CommonService';
