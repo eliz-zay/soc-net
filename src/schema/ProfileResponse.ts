@@ -1,7 +1,6 @@
 import { ApiModel, ApiModelProperty, SwaggerDefinitionConstant } from 'swagger-express-ts';
-import { User, PostGroup, Post } from '../model';
-import { GroupSchema, transformToGroupsSchema } from './GroupSchema';
-import { PostSchema } from './PostSchema';
+import { User, PostGroup, Post, EOccupation } from '../model';
+import { GroupSchema, PostSchema, transformToGroupsSchema } from '.';
 
 @ApiModel()
 export class ProfileSchema {
@@ -22,6 +21,18 @@ export class ProfileSchema {
 
     @ApiModelProperty({ required: true })
     followersCount: number;
+
+    @ApiModelProperty({ required: true, enum: Object.values(EOccupation).filter((value) => typeof value === 'string') })
+    occupation: EOccupation;
+
+    @ApiModelProperty({ required: true })
+    country: string;
+    
+    @ApiModelProperty({ required: true })
+    region: string;
+
+    @ApiModelProperty({ required: false })
+    telegram?: string;
 }
 
 @ApiModel()
@@ -51,7 +62,10 @@ export function transformToProfileDataSchema(
     posts: (Post & { likesCount: number; })[]
 
 ): ProfileDataSchema {
-    const { name, username, basicDescription, photoUrl, followeesCount, followersCount } = user;
+    const {
+        name, username, basicDescription, photoUrl, followeesCount, followersCount,
+        occupation, country, region, telegram
+    } = user;
 
     return {
         profile: {
@@ -60,7 +74,11 @@ export function transformToProfileDataSchema(
             basicDescription,
             photoUrl,
             followeesCount,
-            followersCount
+            followersCount,
+            occupation: occupation!,
+            country: country!.name,
+            region: region!.name,
+            telegram
         },
         groups: groups.map((group) => transformToGroupsSchema(group)),
         posts: posts.map(({ id, content, mediaUrls, tags, likesCount, comments }) => ({

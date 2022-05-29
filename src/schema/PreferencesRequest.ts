@@ -9,6 +9,10 @@ export class PreferencesRequest {
     @ApiModelProperty({ required: true })
     visibleForAdProposal: boolean;
 
+    @IsBoolean()
+    @ApiModelProperty({ required: true })
+    wantsToUseBusinessProfile: boolean;
+
     @IsOptional()
     @IsString()
     @ApiModelProperty({ required: false })

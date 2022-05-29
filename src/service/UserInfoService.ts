@@ -25,7 +25,7 @@ export class UserInfoService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -35,7 +35,7 @@ export class UserInfoService {
             throw ErrorMessages.UserAlreadyFilledPersonalInfo;
         }
 
-        const { gender, birthday, countryId, regionId, cityId } = payload;
+        const { name, gender, birthday, countryId, regionId, cityId, telegram } = payload;
 
         /**
          * Checking existence and relation of geo
@@ -43,7 +43,7 @@ export class UserInfoService {
 
         const geoIds = cityId ? [countryId, regionId, cityId] : [countryId, regionId];
 
-        const geoList = await this.geoRepository.find({ id: In(geoIds) });
+        const geoList = await this.geoRepository.find({ where: { id: In(geoIds) } });
 
         if (geoIds.length !== geoList.length) {
             throw ErrorMessages.GeoWithGivenIdDoesntExist;
@@ -80,11 +80,13 @@ export class UserInfoService {
         await this.userRepository.update(
             user.id,
             {
+                name,
                 gender,
                 birthday,
                 countryId,
                 regionId,
                 cityId,
+                telegram,
                 profileFillingStage: EProfileFillingStage.Preferences
             }
         );
@@ -95,7 +97,7 @@ export class UserInfoService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -111,7 +113,7 @@ export class UserInfoService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -121,12 +123,20 @@ export class UserInfoService {
             throw ErrorMessages.UserAlreadyFilledPreferences;
         }
 
-        const { visibleForAdProposal, businessDescription, occupation, hobbies, profileViewType } = payload;
+        const {
+            visibleForAdProposal,
+            wantsToUseBusinessProfile,
+            businessDescription,
+            occupation,
+            hobbies,
+            profileViewType
+        } = payload;
 
         await this.userRepository.update(
             user.id,
             {
                 visibleForAdProposal,
+                wantsToUseBusinessProfile,
                 businessDescription,
                 occupation,
                 hobbies,
@@ -140,7 +150,7 @@ export class UserInfoService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -178,7 +188,7 @@ export class UserInfoService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;

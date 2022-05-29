@@ -29,7 +29,7 @@ export class MailService {
     }
 
     public async buildMessage(type: EMailType, data: object): Promise<{ title: string; text: string }> {
-        const mailType = await this.mailTypeRepository.findOne({ code: type });
+        const mailType = await this.mailTypeRepository.findOne({ where: { code: type } });
 
         assert(!!mailType, 'mailType must be defined');
 

@@ -78,7 +78,7 @@ export class AuthService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -120,7 +120,7 @@ export class AuthService {
     public async getUserInfo(jwtPayload: JwtPayload): Promise<UserSchema> {
         const { id } = jwtPayload;
 
-        const user = await this.userRepository.findOne({ id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id, deletedAt: IsNull() } });
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
@@ -132,8 +132,8 @@ export class AuthService {
         const { emailOrUsername, password } = signInRequest;
 
         const user = emailOrUsername.includes('@')
-            ? await this.userRepository.findOne({ email: emailOrUsername, deletedAt: IsNull() })
-            : await this.userRepository.findOne({ username: emailOrUsername, deletedAt: IsNull() });
+            ? await this.userRepository.findOne({ where: { email: emailOrUsername, deletedAt: IsNull() } })
+            : await this.userRepository.findOne({ where: { username: emailOrUsername, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.EmailOrUsernameIncorrect;
@@ -153,7 +153,7 @@ export class AuthService {
     public async checkOtpCode(checkOtpCodeRequest: CheckOtpCodeRequest): Promise<SuccessResponse> {
         const { otpCode, email } = checkOtpCodeRequest;
 
-        const user = await this.userRepository.findOne({ email, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { email, deletedAt: IsNull() } });
         if (!user) {
             throw ErrorMessages.UserWithGivenEmailDoesntExist;
         }
@@ -175,7 +175,7 @@ export class AuthService {
     public async requestPasswordReset(requestPasswordResetRequest: RequestPasswordResetRequest): Promise<SuccessResponse> {
         const { email } = requestPasswordResetRequest;
 
-        const user = await this.userRepository.findOne({ email, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { email, deletedAt: IsNull() } });
         if (!user) {
             throw ErrorMessages.UserWithGivenEmailDoesntExist;
         }
@@ -204,7 +204,7 @@ export class AuthService {
 
         await this.checkOtpCode({ email, otpCode });
 
-        const user = await this.userRepository.findOne({ email, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { email, deletedAt: IsNull() } });
         if (!user) {
             throw ErrorMessages.UserWithGivenEmailDoesntExist;
         }
@@ -219,7 +219,7 @@ export class AuthService {
     public async changePassword(jwtPayload: JwtPayload, changePasswordRequest: ChangePasswordRequest): Promise<SuccessResponse> {
         const { currentPassword, newPassword } = changePasswordRequest;
 
-        const user = await this.userRepository.findOne({ email: jwtPayload.email, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { email: jwtPayload.email, deletedAt: IsNull() } });
         if (!user) {
             throw ErrorMessages.UserWithGivenEmailDoesntExist;
         }
@@ -241,7 +241,7 @@ export class AuthService {
     public async deleteUser(jwtPayload: JwtPayload): Promise<SuccessResponse> {
         const { id } = jwtPayload;
 
-        const user = await this.userRepository.findOne({ id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id, deletedAt: IsNull() } });
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }

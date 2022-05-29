@@ -28,7 +28,7 @@ export class NotificationService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -56,7 +56,7 @@ export class NotificationService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;

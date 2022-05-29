@@ -30,7 +30,7 @@ export class PostService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -39,8 +39,8 @@ export class PostService {
         const { content, groupId, dealId, tags } = payload;
 
         const [group, deal] = await Promise.all([
-            this.postGroupRepository.findOne({ id: groupId, deletedAt: IsNull() }),
-            dealId ? this.dealRepository.findOne({ id: dealId, deletedAt: IsNull() }) : null
+            this.postGroupRepository.findOne({ where: { id: groupId, deletedAt: IsNull() } }),
+            dealId ? this.dealRepository.findOne({ where: { id: dealId, deletedAt: IsNull() } }) : null
         ]);
 
         if (groupId && !group) {
@@ -77,7 +77,7 @@ export class PostService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -106,7 +106,7 @@ export class PostService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -140,7 +140,7 @@ export class PostService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -172,7 +172,7 @@ export class PostService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -195,7 +195,7 @@ export class PostService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;

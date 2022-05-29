@@ -158,5 +158,10 @@ export const ErrorMessages = Object.freeze({
         title: 'Вы уже добавили медиа к этому посту',
         message: 'Вы уже добавили медиа к этому посту',
         code: 31
+    }),
+    YouCantFollowYourself: new ErrorSchema({
+        title: 'Вы не можете подписаться сами на себя',
+        message: 'Вы не можете подписаться сами на себя',
+        code: 32
     })
 });

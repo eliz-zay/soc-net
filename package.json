@@ -51,7 +51,7 @@
     "reflect-metadata": "^0.1.13",
     "swagger-express-ts": "^1.0.1",
     "swagger-ui-dist": "^3.36.2",
-    "typeorm": "^0.2.37",
+    "typeorm": "^0.3.6",
     "winston": "^3.3.3"
   },
   "devDependencies": {
@@ -59,13 +59,13 @@
     "@types/cors": "^2.8.8",
     "@types/express": "^4.17.9",
     "@types/express-jwt": "0.0.42",
+    "@types/jest": "^27.0.2",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/lodash": "^4.14.165",
     "@types/node": "^14.14.8",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.0.5",
-    "@types/jest": "^27.0.2",
     "jest": "^27.2.4",
-    "ts-jest": "^27.0.5"
+    "rimraf": "^3.0.2",
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.0.5"
   }
 }

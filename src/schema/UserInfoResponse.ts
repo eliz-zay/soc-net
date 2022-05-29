@@ -4,6 +4,9 @@ import { ETag, EOccupation, EUserGender, User } from '../model';
 
 @ApiModel()
 export class UserInfoSchema {
+    @ApiModelProperty({ required: true })
+    name: string;
+
     @ApiModelProperty({ required: true, enum: Object.values(EUserGender).filter((value) => typeof value === 'string') })
     gender: EUserGender;
 
@@ -21,6 +24,9 @@ export class UserInfoSchema {
 
     @ApiModelProperty({ required: true })
     visibleForAdProposal: boolean;
+
+    @ApiModelProperty({ required: true })
+    wantsToUseBusinessProfile: boolean;
 
     @ApiModelProperty({ required: false })
     businessDescription?: string;
@@ -49,11 +55,12 @@ export class UserInfoResponse {
 
 export function transformToUserInfoSchema(user: User): UserInfoSchema {
     const {
-        gender, birthday, country, region, city, businessDescription,
-        occupation, hobbies, visibleForAdProposal
+        name, gender, birthday, country, region, city, businessDescription,
+        occupation, hobbies, visibleForAdProposal, wantsToUseBusinessProfile
     } = user;
 
     return {
+        name: name!,
         gender: gender!,
         birthday: moment(birthday!).format('YYYY-MM-DD'),
         country: country!.name,
@@ -62,6 +69,7 @@ export function transformToUserInfoSchema(user: User): UserInfoSchema {
         businessDescription,
         occupation: occupation!,
         hobbies: hobbies!,
-        visibleForAdProposal: visibleForAdProposal!
+        visibleForAdProposal: visibleForAdProposal!,
+        wantsToUseBusinessProfile: wantsToUseBusinessProfile!
     };
 }

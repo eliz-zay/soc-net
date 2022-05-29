@@ -33,7 +33,7 @@ export class PostGroupService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -41,7 +41,7 @@ export class PostGroupService {
 
         const { name, viewType } = payload;
 
-        const groups = await this.postGroupRepository.find({ userId: jwtPayload.id });
+        const groups = await this.postGroupRepository.find({ where: { userId: jwtPayload.id } });
 
         if (groups.length === KMaxGroupsPerUser) {
             throw ErrorMessages.MaxGroupsCountReached;
@@ -66,7 +66,7 @@ export class PostGroupService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -84,7 +84,7 @@ export class PostGroupService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -100,7 +100,7 @@ export class PostGroupService {
             throw ErrorMessages.AuthorizationRequired;
         }
 
-        const user = await this.userRepository.findOne({ id: jwtPayload.id, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: jwtPayload.id, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -112,7 +112,7 @@ export class PostGroupService {
     }
 
     public async get(userId: number): Promise<GroupSchema[]> {
-        const user = await this.userRepository.findOne({ id: userId, deletedAt: IsNull() });
+        const user = await this.userRepository.findOne({ where: { id: userId, deletedAt: IsNull() } });
 
         if (!user) {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
@@ -145,7 +145,7 @@ export class PostGroupService {
     }
 
     private async validateUserGroup(userId: number, groupId: number): Promise<PostGroup> {
-        const group = await this.postGroupRepository.findOne({ id: groupId, deletedAt: IsNull() });
+        const group = await this.postGroupRepository.findOne({ where: { id: groupId, deletedAt: IsNull() } });
 
         if (!group) {
             throw ErrorMessages.PostGroupDoesntExist;

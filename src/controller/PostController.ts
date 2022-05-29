@@ -101,7 +101,7 @@ export class PostController implements interfaces.Controller {
         return { success: true };
     }
 
-    @ApiOperationPatch({
+    @ApiOperationPost({
         path: '/posts/{id}/like',
         parameters: {
             path: {
@@ -115,7 +115,7 @@ export class PostController implements interfaces.Controller {
         },
         responses: { 200: { model: "SuccessResponse" } }
     })
-    @httpPatch('/posts/:id/like', checkIfUserActivated())
+    @httpPost('/posts/:id/like', checkIfUserActivated())
     private async likePost(@request() req: express.Request & { user: JwtPayload }): Promise<SuccessResponse> {
         const id = req.params.id;
 
@@ -128,7 +128,7 @@ export class PostController implements interfaces.Controller {
         return { success: true };
     }
 
-    @ApiOperationPatch({
+    @ApiOperationPost({
         path: '/posts/{id}/comment',
         parameters: {
             body: { required: true, model: "PostCommentRequest" },
@@ -143,7 +143,7 @@ export class PostController implements interfaces.Controller {
         },
         responses: { 200: { model: "SuccessResponse" } }
     })
-    @httpPatch('/posts/:id/comment', checkIfUserActivated(), makeValidateBody(PostCommentRequest))
+    @httpPost('/posts/:id/comment', checkIfUserActivated(), makeValidateBody(PostCommentRequest))
     private async commentPost(
         @request() req: express.Request & { user: JwtPayload },
         @requestBody() body: PostCommentRequest

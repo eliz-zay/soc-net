@@ -89,14 +89,14 @@ export class User {
     birthday?: Date;
 
     @Column({ name: 'country_id', type: 'int', nullable: true })
-    countryId: number;
+    countryId?: number;
 
     @ManyToOne(() => Geo, { nullable: false })
     @JoinColumn({ name: "country_id" })
     country?: Geo;
 
     @Column({ name: 'region_id', type: 'int', nullable: true })
-    regionId: number;
+    regionId?: number;
 
     @ManyToOne(() => Geo, { nullable: false })
     @JoinColumn({ name: "region_id" })
@@ -113,19 +113,25 @@ export class User {
     profileFillingStage: EProfileFillingStage;
 
     @Column({ type: 'varchar', length: 50, nullable: true })
-    occupation: EOccupation;
+    occupation?: EOccupation;
 
     @Column({ type: 'varchar', length: 50, array: true, nullable: true })
-    hobbies: ETag[];
+    hobbies?: ETag[];
 
-    @Column({ name: 'visible_for_ad_proposal', type: 'boolean', nullable: false, default: true })
-    visibleForAdProposal: boolean;
+    @Column({ name: 'visible_for_ad_proposal', type: 'boolean', nullable: true })
+    visibleForAdProposal?: boolean;
+
+    @Column({ name: 'wants_to_use_business_profile', type: 'boolean', nullable: true })
+    wantsToUseBusinessProfile?: boolean;
 
     @Column({ name: 'basic_description', type: 'varchar', length: '200', nullable: true })
     basicDescription?: string;
 
     @Column({ name: 'business_description', type: 'varchar', length: '1000', nullable: true })
     businessDescription?: string;
+
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    telegram?: string;
 
     @ManyToMany(() => User, (user) => user.followers)
     @JoinTable({ joinColumn: { name: 'follower_id' }, inverseJoinColumn: { name: 'followee_id' } })
