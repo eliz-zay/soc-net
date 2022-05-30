@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
 
-import { Deal, MediaUrl, Post, PostGroup, User } from '../model';
+import { Deal, MediaUrl, Post, PostGroup, Tag, User } from '../model';
 import { AddPostRequest, PostCommentRequest, PostDetailsDataSchema, transformToPostDetailsDataSchema, UpdatePostRequest } from '../schema';
 import { getFileType, JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
@@ -14,6 +14,7 @@ export class PostService {
     private postGroupRepository: Repository<PostGroup>;
     private postRepository: Repository<Post>;
     private dealRepository: Repository<Deal>;
+    private tagRepository: Repository<Tag>;
 
     constructor(
         @inject('LoggerService') private logger: LoggerService,
@@ -23,6 +24,7 @@ export class PostService {
         this.postGroupRepository = getRepository(PostGroup);
         this.postRepository = getRepository(Post);
         this.dealRepository = getRepository(Deal);
+        this.tagRepository = getRepository(Tag);
     }
 
     public async addPost(jwtPayload: JwtPayload, payload: AddPostRequest): Promise<number> {
@@ -36,7 +38,7 @@ export class PostService {
             throw ErrorMessages.UserWithGivenIdDoesntExist;
         }
 
-        const { content, groupId, dealId, tags } = payload;
+        const { content, groupId, dealId, tags: tagCodes } = payload;
 
         const [group, deal] = await Promise.all([
             this.postGroupRepository.findOne({ where: { id: groupId, deletedAt: IsNull() } }),
@@ -50,6 +52,8 @@ export class PostService {
         if (dealId && !deal) {
             throw ErrorMessages.DealDoesntExist;
         }
+
+        const tags = await this.tagRepository.find({ code: In(tagCodes), deletedAt: IsNull() });
 
         const post: Post = new Post({
             content,
@@ -118,21 +122,19 @@ export class PostService {
             throw ErrorMessages.PostDoesntExist;
         }
 
-        const updateBody: Partial<Post> = {};
-
-        const { content, groupId, tags } = payload;
+        const { content, groupId, tags: tagCodes } = payload;
 
         if (content) {
-            updateBody.content = content;
+            post.content = content;
         }
         if (groupId) {
-            updateBody.postGroupId = groupId;
+            post.postGroupId = groupId;
         }
-        if (tags) {
-            updateBody.tags = tags;
+        if (tagCodes) {
+            post.tags = await this.tagRepository.find({ code: In(tagCodes), deletedAt: IsNull() });
         }
 
-        await this.postRepository.update(postId, updateBody);
+        await this.postRepository.save(post);
     }
 
     public async likePost(jwtPayload: JwtPayload, postId: number) {

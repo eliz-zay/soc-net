@@ -8,14 +8,11 @@ import {
     ManyToOne,
     ManyToMany,
     OneToOne,
+    JoinTable
 } from 'typeorm';
 
-import { User } from './User';
-import { PostGroup } from './PostGroup';
-import { Deal } from './Deal';
-
+import { User, PostGroup, Deal, Tag } from '.';
 import { EFileType } from '../core';
-import { ETag } from './ETag';
 
 export class MediaUrl {
     type: EFileType;
@@ -68,8 +65,9 @@ export class Post {
     @Column({ name: 'likes_count', type: 'int', nullable: false, default: 0 })
     likesCount: number;
 
-    @Column({ name: 'tags', type: 'varchar', length: 50, array: true, nullable: false, default: [] })
-    tags: ETag[];
+    @ManyToMany(() => Tag, (tag) => tag.posts)
+    @JoinTable({ joinColumn: { name: 'post_id' }, inverseJoinColumn: { name: 'tag_code' } })
+    tags: Tag[];
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;

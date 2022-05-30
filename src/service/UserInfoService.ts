@@ -1,8 +1,15 @@
 import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
 
-import { EGeoRange, EProfileFillingStage, Geo, User } from '../model';
-import { PersonalInfoRequest, UserInfoPatchRequest, PreferencesRequest, UserInfoSchema, transformToUserInfoSchema, UpdateBasicDescriptionRequest } from '../schema';
+import {
+    PersonalInfoRequest,
+    UserInfoPatchRequest,
+    PreferencesRequest,
+    UserInfoSchema,
+    transformToUserInfoSchema,
+    UpdateBasicDescriptionRequest
+} from '../schema';
+import { EGeoRange, EProfileFillingStage, Geo, User, Tag } from '../model';
 import { JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
@@ -11,6 +18,7 @@ import { LoggerService, StorageService } from '.';
 export class UserInfoService {
     private userRepository: Repository<User>;
     private geoRepository: Repository<Geo>;
+    private tagRepository: Repository<Tag>;
 
     constructor(
         @inject('LoggerService') private logger: LoggerService,
@@ -18,6 +26,7 @@ export class UserInfoService {
     ) {
         this.userRepository = getRepository(User);
         this.geoRepository = getRepository(Geo);
+        this.tagRepository = getRepository(Tag);
     }
 
     public async addPersonalInfo(jwtPayload: JwtPayload, payload: PersonalInfoRequest): Promise<void> {
@@ -128,21 +137,22 @@ export class UserInfoService {
             wantsToUseBusinessProfile,
             businessDescription,
             occupation,
-            hobbies,
+            hobbies: hobbieCodes,
             profileViewType
         } = payload;
 
-        await this.userRepository.update(
-            user.id,
-            {
-                visibleForAdProposal,
-                wantsToUseBusinessProfile,
-                businessDescription,
-                occupation,
-                hobbies,
-                profileFillingStage: EProfileFillingStage.Filled
-            }
-        );
+        const hobbies = await this.tagRepository.find({ code: In(hobbieCodes), deletedAt: IsNull() });
+
+        Object.assign(user, {
+            visibleForAdProposal,
+            wantsToUseBusinessProfile,
+            businessDescription,
+            occupation,
+            hobbies,
+            profileFillingStage: EProfileFillingStage.Filled
+        });
+
+        await this.userRepository.save(user); 
     }
 
     async update(jwtPayload: JwtPayload, payload: UserInfoPatchRequest) {

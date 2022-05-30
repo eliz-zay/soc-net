@@ -51,7 +51,7 @@
     "reflect-metadata": "^0.1.13",
     "swagger-express-ts": "^1.0.1",
     "swagger-ui-dist": "^3.36.2",
-    "typeorm": "^0.3.6",
+    "typeorm": "^0.2.37",
     "winston": "^3.3.3"
   },
   "devDependencies": {

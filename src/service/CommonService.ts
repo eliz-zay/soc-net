@@ -1,18 +1,19 @@
 import { ErrorMessages } from '../messages';
 import { inject, injectable } from "inversify";
-import winston from "winston";
-import { getRepository, Repository } from "typeorm";
+import { getRepository, IsNull, Repository } from "typeorm";
 
-import { Geo, EGeoRange } from '../model/';
-import { GeoDataSchema, transformToGeoSchema } from '../schema/';
+import { Geo, EGeoRange, Tag } from '../model/';
+import { GeoDataSchema, transformToGeoSchema, TagsDataSchema, transformToTagSchema } from '../schema/';
 import { LoggerService } from '.';
 
 @injectable()
 export class CommonService {
     private geoRepository: Repository<Geo>;
+    private tagRepository: Repository<Tag>;
 
     constructor(@inject('LoggerService') private logger: LoggerService) {
         this.geoRepository = getRepository(Geo);
+        this.tagRepository = getRepository(Tag);
     }
 
     public async getCountries(): Promise<GeoDataSchema> {
@@ -49,5 +50,11 @@ export class CommonService {
         return {
             geoList: geoPresets.map((geoPreset) => transformToGeoSchema(geoPreset))
         }
+    }
+
+    public async getTags(): Promise<TagsDataSchema> {
+        const tags = await this.tagRepository.find({ deletedAt: IsNull() });
+
+        return { tags: tags.map((tag) => transformToTagSchema(tag)) };
     }
 }

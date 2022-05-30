@@ -11,12 +11,7 @@ import {
     JoinTable,
 } from "typeorm";
 
-import { Geo } from '.';
-import { Post } from './Post';
-import { PostGroup } from './PostGroup';
-import { Notification } from './Notification';
-import { DealTemplate } from "./DealTemplate";
-import { ETag } from "./ETag";
+import { Geo, Post, PostGroup, Notification, DealTemplate, Tag } from '.';
 
 export class OtpCode {
     code: number;
@@ -115,8 +110,9 @@ export class User {
     @Column({ type: 'varchar', length: 50, nullable: true })
     occupation?: EOccupation;
 
-    @Column({ type: 'varchar', length: 50, array: true, nullable: true })
-    hobbies?: ETag[];
+    @ManyToMany(() => Tag, (tag) => tag.users)
+    @JoinTable({ joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'tag_code' } })
+    hobbies: Tag[];
 
     @Column({ name: 'visible_for_ad_proposal', type: 'boolean', nullable: true })
     visibleForAdProposal?: boolean;

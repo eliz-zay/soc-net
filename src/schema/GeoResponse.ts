@@ -20,7 +20,7 @@ export class GeoDataSchema {
 }
 
 @ApiModel()
-export class GeoResponseSchema {
+export class GeoResponse {
     @ApiModelProperty({ required: true })
     success: true;
 

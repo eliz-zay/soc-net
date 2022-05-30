@@ -1,7 +1,8 @@
 import { ApiModel, ApiModelProperty, SwaggerDefinitionConstant } from 'swagger-express-ts';
 
+import { TagSchema } from '.';
 import { EFileType } from '../core/files';
-import { ETag, Post } from '../model';
+import { Post } from '../model';
 
 @ApiModel()
 export class PostSchema {
@@ -17,8 +18,8 @@ export class PostSchema {
     @ApiModelProperty({ itemType: SwaggerDefinitionConstant.Response.Type.ARRAY, model: "MediaUrlSchema", required: true })
     mediaUrls: MediaUrlSchema[];
 
-    @ApiModelProperty({ required: true, type: 'array', itemType: 'string', enum: Object.values(ETag).filter((value) => typeof value === 'string') })
-    tags: ETag[];
+    @ApiModelProperty({ itemType: SwaggerDefinitionConstant.Response.Type.ARRAY, model: "TagSchema", required: true })
+    tags: TagSchema[];
 
     @ApiModelProperty({ required: true })
     likesCount: number;
