@@ -1,7 +1,6 @@
 import { ApiModel, ApiModelProperty, SwaggerDefinitionConstant } from 'swagger-express-ts';
 
-import { TagSchema } from '.';
-import { EFileType } from '../core/files';
+import { TagSchema, MediaUrlSchema } from '.';
 import { Post } from '../model';
 
 @ApiModel()
@@ -26,15 +25,6 @@ export class PostSchema {
 
     @ApiModelProperty({ required: true })
     commentsCount: number;
-}
-
-@ApiModel()
-export class MediaUrlSchema {
-    @ApiModelProperty({ required: true, type: 'string', enum: Object.values(EFileType).filter((value) => typeof value === 'string') })
-    type: EFileType;
-
-    @ApiModelProperty({ required: true })
-    url: string;
 }
 
 export function transformToPostSchema(post: Post): PostSchema {

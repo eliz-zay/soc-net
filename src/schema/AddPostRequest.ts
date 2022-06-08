@@ -1,6 +1,6 @@
 import { ApiModel, ApiModelProperty } from 'swagger-express-ts';
-
 import { ArrayMaxSize, IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+
 import { ETag } from '../model';
 
 @ApiModel()

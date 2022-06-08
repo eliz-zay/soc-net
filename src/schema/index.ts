@@ -16,13 +16,17 @@ export * from './PaginationRequest';
 export * from './PostCommentRequest';
 export * from './UpdateBasicDescriptionRequest';
 export * from './MarkReadNotificationsRequest';
+export * from './MyFeedRequest';
+export * from './RecommendationsFeedRequest';
 
 export * from './PostSchema';
 export * from './UserSchema';
 export * from './ErrorSchema';
 export * from './GroupSchema';
 export * from './PostCommentSchema';
+export * from './PostAndAuthorSchema';
 export * from './ProfileSummarySchema';
+export * from './MediaUrlSchema';
 
 export * from './LoggedInUserResponse';
 export * from './UserResponse';
@@ -36,3 +40,4 @@ export * from './ProfileResponse';
 export * from './GroupAndPostsResponse';
 export * from './GeoResponse';
 export * from './TagsResponse';
+export * from './FeedResponse';

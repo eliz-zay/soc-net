@@ -25,7 +25,8 @@ import {
     PostService,
     NotificationService,
     ProfileService,
-    CommonService
+    CommonService,
+    FeedService
 } from './service';
 
 import { ErrorSchema } from './schema/';
@@ -47,6 +48,7 @@ async function bootstrapServer() {
         mContainer.bind<NotificationService>('NotificationService').to(NotificationService);
         mContainer.bind<ProfileService>('ProfileService').to(ProfileService);
         mContainer.bind<CommonService>('CommonService').to(CommonService);
+        mContainer.bind<FeedService>('FeedService').to(FeedService);
     });
 
     const expressServer = new InversifyExpressServer(container, null, { rootPath: "/api" });

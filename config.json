@@ -1,3 +1,4 @@
 {
-    "postsPerProfile": 50
+    "postsPerProfile": 50,
+    "myFeedHoursLimit": 8
 }

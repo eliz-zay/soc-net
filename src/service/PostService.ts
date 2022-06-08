@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
 import { getRepository, In, IsNull, Repository } from "typeorm";
+import moment from "moment";
 
 import { Deal, MediaUrl, Post, PostGroup, Tag, User } from '../model';
 import { AddPostRequest, PostCommentRequest, PostDetailsDataSchema, transformToPostDetailsDataSchema, UpdatePostRequest } from '../schema';
 import { getFileType, JwtPayload } from '../core';
 import { ErrorMessages } from '../messages';
 import { LoggerService, StorageService } from '.';
-import moment from "moment";
 
 @injectable()
 export class PostService {
