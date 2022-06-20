@@ -4,7 +4,7 @@ import { interfaces, controller, request, httpGet } from 'inversify-express-util
 import { inject } from 'inversify';
 
 import { FeedService } from '../service';
-import { MyFeedRequest, RecommendationsFeedRequest, FeedResponse } from '../schema';
+import { MyFeedRequest, FeedResponse, PaginationRequest } from '../schema';
 import { JwtPayload, transformAndValidate } from '../core';
 
 @ApiPath({
@@ -32,7 +32,7 @@ export class HomeController implements interfaces.Controller {
                     type: SwaggerDefinitionConstant.Parameter.Type.INTEGER,
                     minimum: 1,
                 },
-                mediaType: {
+                mediaTypes: {
                     description: 'Media types',
                     required: false,
                     type: SwaggerDefinitionConstant.Parameter.Type.ARRAY
@@ -45,6 +45,34 @@ export class HomeController implements interfaces.Controller {
     private async getMyFeed(@request() req: express.Request & { user: JwtPayload }): Promise<FeedResponse> {
         const feedRequest: MyFeedRequest = await transformAndValidate(MyFeedRequest, req.query);
         const posts = await this.feedService.getMyFeed(req.user, feedRequest);
+
+        return { success: true, data: { posts } };
+    }
+
+    @ApiOperationGet({
+        path: '/recommendations',
+        parameters: {
+            query: {
+                page: {
+                    description: 'Page number',
+                    required: false,
+                    type: SwaggerDefinitionConstant.Parameter.Type.INTEGER,
+                    minimum: 1
+                },
+                count: {
+                    description: 'Number of elements per page',
+                    required: false,
+                    type: SwaggerDefinitionConstant.Parameter.Type.INTEGER,
+                    minimum: 1,
+                }
+            }
+        },
+        responses: { 200: { model: 'FeedResponse' } },
+    })
+    @httpGet('/recommendations')
+    private async getRecommendations(@request() req: express.Request & { user: JwtPayload }): Promise<FeedResponse> {
+        const feedRequest: PaginationRequest = await transformAndValidate(PaginationRequest, req.query);
+        const posts = await this.feedService.getRecommendations(req.user, feedRequest);
 
         return { success: true, data: { posts } };
     }

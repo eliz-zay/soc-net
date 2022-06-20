@@ -1,4 +1,9 @@
 {
     "postsPerProfile": 50,
-    "myFeedHoursLimit": 8
+    "myFeedHoursLimit": 8,
+    "recommendationCoefficients": {
+        "minutes": -10,
+        "likes": 1,
+        "tags": 100
+    }
 }

@@ -17,7 +17,6 @@ export * from './PostCommentRequest';
 export * from './UpdateBasicDescriptionRequest';
 export * from './MarkReadNotificationsRequest';
 export * from './MyFeedRequest';
-export * from './RecommendationsFeedRequest';
 
 export * from './PostSchema';
 export * from './UserSchema';

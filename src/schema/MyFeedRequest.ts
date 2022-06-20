@@ -24,5 +24,5 @@ export class MyFeedRequest {
     @Transform((value) => value?.value ? value.value.split(',') : [], { toClassOnly: true })
     @IsEnum(EFileType, { each: true })
     @IsOptional()
-    mediaType?: EFileType[];
+    mediaTypes?: EFileType[];
 }
