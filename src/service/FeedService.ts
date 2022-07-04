@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { getRepository, In, IsNull, Repository } from "typeorm";
+import { getRepository, IsNull, Repository, getConnection } from "typeorm";
 import moment from "moment";
 
 import { LoggerService, StorageService } from ".";
@@ -72,7 +72,6 @@ export class FeedService {
             .slice((payload.page - 1) * payload.count, payload.count);
     }
 
-    // TODO: add pagination (bug with skip/take and join)
     public async getRecommendations(jwtPayload: JwtPayload, payload: PaginationRequest): Promise<PostAndAuthorSchema[]> {
         if (!jwtPayload) {
             throw ErrorMessages.AuthorizationRequired;
@@ -93,34 +92,50 @@ export class FeedService {
         const hobbieCodes = user.hobbies.map((tag) => tag.code);
         const followeeIds = user.followees.map((f) => f.id);
 
-        const postStatQuery = this.postRepository
-            .createQueryBuilder('post')
-            .select('post.id', 'post_id')
-            .addSelect(`sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int)::int`, 'tag_score')
-            .addSelect(`(extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60)::int`, 'minutes_score')
-            .leftJoin('post.tags', 'tag')
-            .where('post.deletedAt is null')
-            .groupBy('post.id')
-            .having(`sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int) > 0`);
+        const filterQuery = getConnection()
+            .createQueryBuilder()
+            .select('sub_query.post_id', 'id')
+            .addSelect(`
+                ${config.recommendationCoefficients.minutes} * sub_query.minutes_score
+                + ${config.recommendationCoefficients.tags} * sub_query.tag_score
+                + ${config.recommendationCoefficients.likes} * sub_query.likes_score
+            `, 'score')
+            .from((subQuery) => {
+                subQuery
+                    .select('post.id', 'post_id')
+                    .addSelect(
+                        `sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int)::int`,
+                        'tag_score'
+                    )
+                    .addSelect(
+                        `(extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60)::int`,
+                        'minutes_score'
+                    )
+                    .addSelect('post.likesCount', 'likes_score')
+                    .from(Post, 'post')
+                    .leftJoin('post.tags', 'tag')
+                    .where('post.deletedAt is null')
+                    .andWhere(`post.userId != ${user.id}`)
+                    .groupBy('post.id')
+                    .having(`sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int) > 0`);
 
-        const postQuery = this.postRepository
+                if (followeeIds.length) {
+                    subQuery.andWhere(`post.user_id not in (${followeeIds})`);
+                }
+
+                return subQuery;
+            }, 'sub_query')
+            .orderBy('score', 'DESC')
+            .skip(payload.count * (payload.page - 1))
+            .take(payload.count)
+            .getQuery();
+
+        const posts = await this.postRepository
             .createQueryBuilder('post')
-            .leftJoinAndSelect('post.tags', 'tag')
+            .innerJoin(`(${filterQuery})`, 'filtered_post', 'filtered_post.id = post.id')
             .innerJoinAndSelect('post.user', 'user')
-            .innerJoin(`(${postStatQuery.getQuery()})`, 'post_stat', 'post_stat.post_id = post.id')
-            .where('user.id != :id', { id: user.id })
-            .andWhere('post.deletedAt is null');
-
-        if (followeeIds.length) {
-            postQuery.andWhere('user.id not in (:...followeeIds)', { followeeIds });
-        }
-
-        const posts = await postQuery
-            .orderBy(`
-                ${config.recommendationCoefficients.minutes} * post_stat.minutes_score
-                + ${config.recommendationCoefficients.tags} * post_stat.tag_score
-                + ${config.recommendationCoefficients.likes} * post.likesCount
-            `, 'DESC')
+            .leftJoinAndSelect('post.tags', 'tag')
+            .orderBy('filtered_post.score', 'DESC')
             .getMany();
 
         return posts.map((post) => transformToPostAndAuthorSchema(post, post.user));
