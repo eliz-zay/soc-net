@@ -94,7 +94,7 @@ export class FeedService {
 
         const filterQuery = getConnection()
             .createQueryBuilder()
-            .select('sub_query.post_id', 'id')
+            .select('sub_query.post_id', 'post_id')
             .addSelect(`
                 ${config.recommendationCoefficients.minutes} * sub_query.minutes_score
                 + ${config.recommendationCoefficients.tags} * sub_query.tag_score
@@ -125,14 +125,13 @@ export class FeedService {
 
                 return subQuery;
             }, 'sub_query')
-            .orderBy('score', 'DESC')
             .skip(payload.count * (payload.page - 1))
             .take(payload.count)
             .getQuery();
 
         const posts = await this.postRepository
             .createQueryBuilder('post')
-            .innerJoin(`(${filterQuery})`, 'filtered_post', 'filtered_post.id = post.id')
+            .innerJoin(`(${filterQuery})`, 'filtered_post', 'filtered_post.post_id = post.id')
             .innerJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.tags', 'tag')
             .orderBy('filtered_post.score', 'DESC')
