@@ -139,4 +139,41 @@ export class FeedService {
 
         return posts.map((post) => transformToPostAndAuthorSchema(post, post.user));
     }
+
+    public async getPopular(payload: PaginationRequest): Promise<PostAndAuthorSchema[]> {
+        const filterQuery = getConnection()
+            .createQueryBuilder()
+            .select('sub_query.post_id', 'post_id')
+            .addSelect(`
+                ${config.popularFeedCoefficients.minutes} * sub_query.minutes_score
+                + ${config.popularFeedCoefficients.likes} * sub_query.likes_score
+            `, 'score')
+            .from((subQuery) => {
+                return subQuery
+                    .select('post.id', 'post_id')
+                    .addSelect(
+                        `(extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60)::int`,
+                        'minutes_score'
+                    )
+                    .addSelect('post.likesCount', 'likes_score')
+                    .from(Post, 'post')
+                    .where('post.deletedAt is null')
+                    .andWhere(`
+                        (extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60 / 60)::int <= 24
+                    `); // posted during the last 24h
+            }, 'sub_query')
+            .skip(payload.count * (payload.page - 1))
+            .take(payload.count)
+            .getQuery();
+
+        const posts = await this.postRepository
+            .createQueryBuilder('post')
+            .innerJoin(`(${filterQuery})`, 'filtered_post', 'filtered_post.post_id = post.id')
+            .innerJoinAndSelect('post.user', 'user')
+            .leftJoinAndSelect('post.tags', 'tag')
+            .orderBy('filtered_post.score', 'DESC')
+            .getMany();
+
+        return posts.map((post) => transformToPostAndAuthorSchema(post, post.user));
+    }
 }

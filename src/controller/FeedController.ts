@@ -76,4 +76,32 @@ export class HomeController implements interfaces.Controller {
 
         return { success: true, data: { posts } };
     }
+
+    @ApiOperationGet({
+        path: '/popular',
+        parameters: {
+            query: {
+                page: {
+                    description: 'Page number',
+                    required: false,
+                    type: SwaggerDefinitionConstant.Parameter.Type.INTEGER,
+                    minimum: 1
+                },
+                count: {
+                    description: 'Number of elements per page',
+                    required: false,
+                    type: SwaggerDefinitionConstant.Parameter.Type.INTEGER,
+                    minimum: 1,
+                }
+            }
+        },
+        responses: { 200: { model: 'FeedResponse' } },
+    })
+    @httpGet('/popular')
+    private async getPopular(@request() req: express.Request): Promise<FeedResponse> {
+        const feedRequest: PaginationRequest = await transformAndValidate(PaginationRequest, req.query);
+        const posts = await this.feedService.getPopular(feedRequest);
+
+        return { success: true, data: { posts } };
+    }
 }
