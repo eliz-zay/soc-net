@@ -13,7 +13,7 @@ import { JwtPayload, transformAndValidate } from '../core';
     security: { 'Api-Key': [], 'Authorization': [] }
 })
 @controller('/feed')
-export class HomeController implements interfaces.Controller {
+export class FeedController implements interfaces.Controller {
     constructor(@inject('FeedService') private feedService: FeedService) { }
 
     @ApiOperationGet({
@@ -44,9 +44,9 @@ export class HomeController implements interfaces.Controller {
     @httpGet('/my')
     private async getMyFeed(@request() req: express.Request & { user: JwtPayload }): Promise<FeedResponse> {
         const feedRequest: MyFeedRequest = await transformAndValidate(MyFeedRequest, req.query);
-        const posts = await this.feedService.getMyFeed(req.user, feedRequest);
+        const data = await this.feedService.getMyFeed(req.user, feedRequest);
 
-        return { success: true, data: { posts } };
+        return { success: true, data };
     }
 
     @ApiOperationGet({
@@ -72,9 +72,9 @@ export class HomeController implements interfaces.Controller {
     @httpGet('/recommendations')
     private async getRecommendations(@request() req: express.Request & { user: JwtPayload }): Promise<FeedResponse> {
         const feedRequest: PaginationRequest = await transformAndValidate(PaginationRequest, req.query);
-        const posts = await this.feedService.getRecommendations(req.user, feedRequest);
+        const data = await this.feedService.getRecommendations(req.user, feedRequest);
 
-        return { success: true, data: { posts } };
+        return { success: true, data };
     }
 
     @ApiOperationGet({
@@ -100,8 +100,8 @@ export class HomeController implements interfaces.Controller {
     @httpGet('/popular')
     private async getPopular(@request() req: express.Request): Promise<FeedResponse> {
         const feedRequest: PaginationRequest = await transformAndValidate(PaginationRequest, req.query);
-        const posts = await this.feedService.getPopular(feedRequest);
+        const data = await this.feedService.getPopular(feedRequest);
 
-        return { success: true, data: { posts } };
+        return { success: true, data };
     }
 }
