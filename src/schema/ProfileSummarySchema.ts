@@ -1,4 +1,4 @@
-import { ApiModel, ApiModelProperty } from 'swagger-express-ts';
+import { ApiModel, ApiModelProperty, SwaggerDefinitionConstant } from 'swagger-express-ts';
 
 import { User } from '../model';
 
@@ -19,13 +19,13 @@ export class ProfileSummarySchema {
 
 @ApiModel()
 export class ProfileSummariesDataSchema {
-    @ApiModelProperty({ required: true })
+    @ApiModelProperty({ required: true, itemType: SwaggerDefinitionConstant.Response.Type.ARRAY, model: 'ProfileSummarySchema' })
     profiles: ProfileSummarySchema[];
 }
 
 @ApiModel()
 export class ProfileSummariesResponse {
-    @ApiModelProperty({ required: true })
+    @ApiModelProperty({ required: true, itemType: SwaggerDefinitionConstant.Response.Type.OBJECT, model: 'ProfileSummarySchema' })
     data: ProfileSummariesDataSchema;
 
     @ApiModelProperty({ required: true })
