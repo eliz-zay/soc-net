@@ -4,7 +4,7 @@ import { interfaces, controller, httpGet, request } from 'inversify-express-util
 import { inject } from 'inversify';
 
 import { CommonService } from '../service';
-import { GeoResponse, TagsResponse } from '../schema';
+import { GeoResponse, OccupationsResponse, TagsResponse } from '../schema';
 import { ErrorMessages } from '../messages';
 
 @ApiPath({
@@ -99,5 +99,17 @@ export class CommonController implements interfaces.Controller {
         const tags = await this.commonService.getTags();
         
         return { success: true, data: tags };
+    }
+
+    @ApiOperationGet({
+        path: '/occupations',
+        parameters: {},
+        responses: { 200: { model: 'OccupationsResponse' } },
+    })
+    @httpGet('/occupations')
+    private async getOccupations(@request() req: express.Request): Promise<OccupationsResponse> {
+        const data = this.commonService.getOccupations();
+        
+        return { success: true, data };
     }
 }

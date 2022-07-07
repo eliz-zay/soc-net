@@ -2,8 +2,15 @@ import { ErrorMessages } from '../messages';
 import { inject, injectable } from "inversify";
 import { getRepository, IsNull, Repository } from "typeorm";
 
-import { Geo, EGeoRange, Tag } from '../model/';
-import { GeoDataSchema, transformToGeoSchema, TagsDataSchema, transformToTagSchema } from '../schema/';
+import { Geo, EGeoRange, Tag, EOccupation } from '../model/';
+import {
+    GeoDataSchema,
+    transformToGeoSchema,
+    TagsDataSchema,
+    transformToTagSchema,
+    OccupationsDataSchema,
+    transformToOccupationSchema
+} from '../schema/';
 import { LoggerService } from '.';
 
 @injectable()
@@ -56,5 +63,11 @@ export class CommonService {
         const tags = await this.tagRepository.find({ deletedAt: IsNull() });
 
         return { tags: tags.map((tag) => transformToTagSchema(tag)) };
+    }
+
+    public getOccupations(): OccupationsDataSchema {
+        const occupations = Object.values(EOccupation).map((code) => transformToOccupationSchema(code));
+        
+        return { occupations };
     }
 }
