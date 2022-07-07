@@ -41,3 +41,4 @@ export * from './GroupAndPostsResponse';
 export * from './GeoResponse';
 export * from './TagsResponse';
 export * from './FeedResponse';
+export * from './OccupationsResponse';
