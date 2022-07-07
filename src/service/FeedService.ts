@@ -9,7 +9,7 @@ import { User, Post } from '../model';
 import {
     MyFeedRequest,
     PaginationRequest,
-    PostAndAuthorSchema,
+    FeedDataSchema,
     transformToPostAndAuthorSchema
 } from "../schema";
 import config from '../../config.json';
@@ -27,7 +27,7 @@ export class FeedService {
         this.postRepository = getRepository(Post);
     }
 
-    public async getMyFeed(jwtPayload: JwtPayload, payload: MyFeedRequest): Promise<PostAndAuthorSchema[]> {
+    public async getMyFeed(jwtPayload: JwtPayload, payload: MyFeedRequest): Promise<FeedDataSchema> {
         if (!jwtPayload) {
             throw ErrorMessages.AuthorizationRequired;
         }
@@ -53,7 +53,7 @@ export class FeedService {
             .getOne();
 
         if (!userAndFollowees) {
-            return [];
+            return { posts: [] };
         }
 
         const { followees } = userAndFollowees;
@@ -66,13 +66,15 @@ export class FeedService {
             });
         }
 
-        return followees
+        const posts = followees
             .map((user) => user.posts.map((post) => transformToPostAndAuthorSchema(post, user)))
             .flat()
             .slice((payload.page - 1) * payload.count, payload.count);
+
+        return { posts };
     }
 
-    public async getRecommendations(jwtPayload: JwtPayload, payload: PaginationRequest): Promise<PostAndAuthorSchema[]> {
+    public async getRecommendations(jwtPayload: JwtPayload, payload: PaginationRequest): Promise<FeedDataSchema> {
         if (!jwtPayload) {
             throw ErrorMessages.AuthorizationRequired;
         }
@@ -94,30 +96,26 @@ export class FeedService {
 
         const filterQuery = getConnection()
             .createQueryBuilder()
-            .select('sub_query.post_id', 'post_id')
-            .addSelect(`
-                ${config.recommendationCoefficients.minutes} * sub_query.minutes_score
-                + ${config.recommendationCoefficients.tags} * sub_query.tag_score
-                + ${config.recommendationCoefficients.likes} * sub_query.likes_score
-            `, 'score')
+            .select('sub_query.*')
             .from((subQuery) => {
                 subQuery
                     .select('post.id', 'post_id')
-                    .addSelect(
-                        `sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int)::int`,
-                        'tag_score'
-                    )
-                    .addSelect(
-                        `(extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60)::int`,
-                        'minutes_score'
-                    )
                     .addSelect('post.likesCount', 'likes_score')
+                    .addSelect(`
+                        ${config.recommendationCoefficients.likes} * post.likesCount
+                        + ${config.recommendationCoefficients.minutes}
+                            * (extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60)::int
+                        + ${config.recommendationCoefficients.tags}
+                            * sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int)::int
+                    `, 'score')
                     .from(Post, 'post')
                     .leftJoin('post.tags', 'tag')
                     .where('post.deletedAt is null')
                     .andWhere(`post.userId != ${user.id}`)
                     .groupBy('post.id')
-                    .having(`sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int) > 0`);
+                    .having(`sum((tag.code in (${hobbieCodes.map((code) => `'${code}'`)}))::int) > 0`)
+                    .orderBy('score', 'DESC')
+                    .addOrderBy('post.id', 'DESC');
 
                 if (followeeIds.length) {
                     subQuery.andWhere(`post.user_id not in (${followeeIds})`);
@@ -135,32 +133,31 @@ export class FeedService {
             .innerJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.tags', 'tag')
             .orderBy('filtered_post.score', 'DESC')
+            .addOrderBy('post.id', 'DESC')
             .getMany();
 
-        return posts.map((post) => transformToPostAndAuthorSchema(post, post.user));
+        return { posts: posts.map((post) => transformToPostAndAuthorSchema(post, post.user)) };
     }
 
-    public async getPopular(payload: PaginationRequest): Promise<PostAndAuthorSchema[]> {
+    public async getPopular(payload: PaginationRequest): Promise<FeedDataSchema> {
         const filterQuery = getConnection()
             .createQueryBuilder()
-            .select('sub_query.post_id', 'post_id')
-            .addSelect(`
-                ${config.popularFeedCoefficients.minutes} * sub_query.minutes_score
-                + ${config.popularFeedCoefficients.likes} * sub_query.likes_score
-            `, 'score')
+            .select('sub_query.*')
             .from((subQuery) => {
                 return subQuery
                     .select('post.id', 'post_id')
-                    .addSelect(
-                        `(extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60)::int`,
-                        'minutes_score'
-                    )
-                    .addSelect('post.likesCount', 'likes_score')
+                    .addSelect(`
+                       ${config.popularFeedCoefficients.likes} * post.likesCount
+                       + ${config.popularFeedCoefficients.minutes}
+                            * (extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60)::int
+                    `, 'score')
                     .from(Post, 'post')
                     .where('post.deletedAt is null')
                     .andWhere(`
                         (extract(epoch from ('${moment().utc().format('YYYY/MM/DD HH:mm:ss')}' - post.createdAt)) / 60 / 60)::int <= 24
-                    `); // posted during the last 24h
+                    `) // posted during the last 24h
+                    .orderBy('score', 'DESC')
+                    .addOrderBy('post.id', 'DESC');
             }, 'sub_query')
             .skip(payload.count * (payload.page - 1))
             .take(payload.count)
@@ -172,8 +169,9 @@ export class FeedService {
             .innerJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.tags', 'tag')
             .orderBy('filtered_post.score', 'DESC')
+            .addOrderBy('post.id', 'DESC')
             .getMany();
 
-        return posts.map((post) => transformToPostAndAuthorSchema(post, post.user));
+        return { posts: posts.map((post) => transformToPostAndAuthorSchema(post, post.user)) };
     }
 }

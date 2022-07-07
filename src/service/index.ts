@@ -9,3 +9,4 @@ export * from './NotificationService';
 export * from './ProfileService';
 export * from './CommonService';
 export * from './FeedService';
+export * from './SearchService';

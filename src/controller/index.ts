@@ -7,3 +7,4 @@ export * from './NotificationController';
 export * from './ProfileController';
 export * from './CommonController';
 export * from './FeedController';
+export * from './SearchController';
