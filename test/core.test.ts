@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 describe('Core functions', () => {
     it('Encodes and decodes correctly', async () => {
-        const someString = 'now and rosgram are pieces of shit';
+        const someString = 'test string';
 
         const encoded = encode(someString);
         const decoded = decode(encoded);
