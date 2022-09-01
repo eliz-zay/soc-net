@@ -80,11 +80,11 @@ function setExpressMiddlewares(app: express.Application) {
         {
             definition: {
                 info: {
-                    title: 'Cosma API',
+                    title: 'socnet API',
                     contact: {
-                        name: "Cosma",
-                        url: "https://www.cosma-app.ru",
-                        email: "team@cosma-app.ru"
+                        name: "socnet",
+                        url: "https://www.socnet-app.ru",
+                        email: "team@socnet-app.ru"
                     },
                     version: "0.0.1",
                 },
